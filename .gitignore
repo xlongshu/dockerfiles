@@ -1,0 +1,18 @@
+### IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Package Files #
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+### Other
+.DS_Store
+*.swp
+*.swo
+*.log
+*.bak

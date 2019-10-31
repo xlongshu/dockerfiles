@@ -1,0 +1,18 @@
+.git/
+.gitignore
+Dockerfile
+README.md
+env.*
+
+### IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+### Other
+.DS_Store
+*.swp
+*.swo
+*.log
+*.bak
