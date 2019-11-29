@@ -48,14 +48,14 @@ hadoop_format_namenode() {
 }
 
 start_hadoops() {
-  local services=("${1//,/ }")
+  local services=(${1//,/ })
   for name in "${services[@]}"; do
     [[ -n ${name} ]] && hadoop_daemon start "$name"
   done
 }
 
 stop_hadoops() {
-  local services=("${1//,/ }")
+  local services=(${1//,/ })
   for name in "${services[@]}"; do
     [[ -n ${name} ]] && hadoop_daemon stop "$name"
   done
