@@ -6,7 +6,8 @@ FROM ubuntu:$FROM_TAG
 #ARG FROM_TAG=stretch
 #FROM debian:$FROM_TAG
 
-MAINTAINER xlongshu
+LABEL version="1.0"
+LABEL maintainer="xlongshu@163.com"
 
 RUN set -xe \
     && sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list \

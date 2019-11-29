@@ -1,7 +1,8 @@
 ARG FROM_TAG=3.10
 FROM alpine:$FROM_TAG
 
-MAINTAINER xlongshu
+LABEL version="1.0"
+LABEL maintainer="xlongshu@163.com"
 
 RUN set -xe \
     && sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
