@@ -3,16 +3,18 @@ FROM debian:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"
 
-# --build-arg MIRROR_DEBIAN=mirrors.ustc.edu.cn
-ARG MIRROR_DEBIAN="mirrors.aliyun.com"
+# --build-arg MIRROR_DEBIAN=mirrors.aliyun.com
+ARG MIRROR_DEBIAN=""
 
-RUN set -xe \
-    && cp -f /etc/apt/sources.list /etc/apt/sources.list.backup \
-    && sed -i "s@http://.*debian.org/debian@http://$MIRROR_DEBIAN/debian@g" /etc/apt/sources.list \
+RUN set -xe; \
+    if [ ${MIRROR_DEBIAN} ]; then \
+        cp -f /etc/apt/sources.list /etc/apt/sources.list.backup; \
+        sed -i "s@http://.*debian.org/debian@http://${MIRROR_DEBIAN}/debian@g" /etc/apt/sources.list; \
+    fi \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    locales tzdata file psmisc iputils-ping net-tools ca-certificates curl \
+    locales tzdata file psmisc iputils-ping net-tools ca-certificates curl netbase \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

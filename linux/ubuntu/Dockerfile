@@ -4,15 +4,17 @@ FROM ubuntu:${FROM_TAG}
 LABEL maintainer="xlongshu@163.com"
 
 # --build-arg MIRROR_UBUNTU=mirrors.ustc.edu.cn
-ARG MIRROR_UBUNTU="mirrors.aliyun.com"
+ARG MIRROR_UBUNTU=""
 
-RUN set -xe \
-    && cp -f /etc/apt/sources.list /etc/apt/sources.list.backup \
-    && sed -i "s@deb http://.*ubuntu.com@deb http://$MIRROR_UBUNTU@g" /etc/apt/sources.list \
+RUN set -xe; \
+    if [ ${MIRROR_UBUNTU} ]; then \
+        cp -f /etc/apt/sources.list /etc/apt/sources.list.backup; \
+        sed -i "s@deb http://.*ubuntu.com@deb http://${MIRROR_UBUNTU}@g" /etc/apt/sources.list; \
+    fi \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    locales tzdata file psmisc iputils-ping net-tools ca-certificates curl \
+    locales tzdata file psmisc iputils-ping net-tools ca-certificates curl netbase \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

@@ -15,14 +15,14 @@ docker tag longe/ubuntu:16.04 longe/ubuntu:xenial
 
 - debian
 ```bash
-# 10 buster
-docker build -t longe/debian:10 ./debian
-docker tag longe/debian:10 longe/debian:buster
+# 9 stretch
+docker build -t longe/debian:9 ./debian
+docker tag longe/debian:9 longe/debian:stretch
 docker tag longe/debian:10 longe/debian:latest
 
-# 9 stretch
-docker build -t longe/debian:9 ./debian --build-arg FROM_TAG=9 --build-arg MIRROR_DEBIAN=mirrors.ustc.edu.cn
-docker tag longe/debian:9 longe/debian:stretch
+# 10 buster
+docker build -t longe/debian:10 ./debian --build-arg FROM_TAG=10 --build-arg MIRROR_DEBIAN=mirrors.aliyun.com
+docker tag longe/debian:10 longe/debian:buster
 ```
 
 - alpine
@@ -32,5 +32,12 @@ docker build -t longe/alpine:3.10 ./alpine
 docker tag longe/alpine:3.10 longe/alpine:latest
 
 # 3.9
-docker build -t longe/alpine:3.9 ./alpine --build-arg FROM_TAG=3.9 --build-arg MIRROR_ALPINE=mirrors.ustc.edu.cn
+docker build -t longe/alpine:3.9 ./alpine --build-arg FROM_TAG=3.9 --build-arg MIRROR_ALPINE=mirrors.aliyun.com
+```
+
+- mirrors
+```
+mirrors.aliyun.com
+mirrors.ustc.edu.cn
+mirrors.163.com
 ```

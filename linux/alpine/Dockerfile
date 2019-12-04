@@ -3,13 +3,13 @@ FROM alpine:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"
 
-# --build-arg MIRROR_ALPINE=mirrors.ustc.edu.cn
-ARG MIRROR_ALPINE="mirrors.aliyun.com"
+# --build-arg MIRROR_ALPINE=mirrors.aliyun.com
+ARG MIRROR_ALPINE=""
 
 RUN set -xe \
-    && sed -i "s@dl-cdn.alpinelinux.org@$MIRROR_ALPINE@g" /etc/apk/repositories \
+    && if [[ ${MIRROR_ALPINE} ]]; then sed -i "s@dl-cdn.alpinelinux.org@${MIRROR_ALPINE}@g" /etc/apk/repositories; fi \
     && apk update && apk upgrade \
-    && apk add tzdata procps file ca-certificates curl \
+    && apk add tzdata file procps ca-certificates curl \
     && rm -rf /var/cache/apk/*
 
 ENV TZ=Asia/Shanghai
