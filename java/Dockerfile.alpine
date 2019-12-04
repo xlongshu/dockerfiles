@@ -1,36 +1,21 @@
 ARG FROM_TAG=3.10
-FROM alpine:$FROM_TAG
+FROM longe/alpine:${FROM_TAG}
 
-LABEL version="1.0"
 LABEL maintainer="xlongshu@163.com"
 
 RUN set -xe \
-    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk update && apk upgrade \
-    && apk add tzdata procps file curl bash bash-completion openjdk8-jre openjdk8 \
+    && apk add bash bash-completion openjdk8-jre openjdk8 \
     && rm -rf /var/cache/apk/*
 
-ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ENV JAVA_HOME="/usr/lib/jvm/default-jvm"
+ENV PATH $JAVA_HOME/bin:$PATH
 
-ENV LANG=en_US.UTF-8
+RUN { echo '#!/bin/sh'; echo 'set -e'; echo 'echo "$JAVA_HOME"'; } > /usr/local/bin/docker-java-home && chmod +x /usr/local/bin/docker-java-home
+RUN { echo '#!/bin/sh'; echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; } > /usr/local/bin/java-home \
+    && chmod +x /usr/local/bin/java-home
 
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
-ENV PATH $JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH:.
-
-#RUN { echo '#!/bin/sh'; echo 'set -e'; echo 'echo "$JAVA_HOME"'; } > /usr/local/bin/docker-java-home && chmod +x /usr/local/bin/docker-java-home
-RUN { echo '#!/bin/sh'; echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; } > /usr/local/bin/docker-java-home \
-    && chmod +x /usr/local/bin/docker-java-home
-
-# configure
-RUN set -xe \
-    && echo "root:`date -R|sha256sum|base64|head -c 12`" | chpasswd \
-    && echo $'\
-export PS1=\'[\u@\h \w]\\$ \'\n\
-alias ll="ls -alF"\n\
-alias la="ls -A"\n\
-alias l="ls -CF"\n'\
->> $HOME/.bashrc
-
+# test
+RUN set -eux; $JAVA_HOME/bin/java -version; $JAVA_HOME/bin/javac -version;
 
 CMD ["/bin/bash"]
