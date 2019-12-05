@@ -1,5 +1,5 @@
 # dockerfiles
-## java
+## java (install openjdk)
 
 - ubuntu, debian
 ```bash
