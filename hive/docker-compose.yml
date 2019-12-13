@@ -1,0 +1,44 @@
+version: "3"
+
+# docker network create --driver=bridge hadoop
+networks:
+  default:
+    external:
+      name: hadoop
+
+services:
+  hive-server:
+    tty: true
+    image: longe/hive:2.3.4
+    hostname: hive-server
+    networks: ["hadoop"]
+    ports:  ["10000:10000", "10002:10002"]
+    depends_on:
+      - hive-metastore
+      - hive-metastore_db
+    environment:
+      - PS1_=hiveserver2
+    env_file:
+      - ./hive.env
+    command: hiveserver2
+
+  hive-metastore:
+    tty: true
+    image: longe/hive:2.3.4
+    hostname: hive-metastore
+    networks: ["hadoop"]
+    ports:  ["9083:9083"]
+    depends_on:
+      - hive-metastore_db
+    environment:
+      - PS1_=metastore
+    env_file:
+      - ./hive.env
+    command: metastore
+
+  hive-metastore_db:
+    image: postgres:9-alpine
+    networks: ["hadoop"]
+    expose: ["5432"]
+    environment:
+      POSTGRES_PASSWORD: hive123456
