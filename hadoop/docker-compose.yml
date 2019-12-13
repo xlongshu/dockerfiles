@@ -1,0 +1,137 @@
+version: "3"
+
+# docker network create --driver=bridge hadoop
+networks:
+  default:
+    external:
+      name: hadoop
+
+services:
+  namenode:
+    tty: true
+    image: longe/hadoop:2.7.7
+    container_name: hadoop-nn
+    hostname: hadoop-nn
+    expose: ["8020", "50070"]
+    ports:  ["8020:8020", "50070:50070"]
+    volumes:
+      - $HOME/hadoop-test/namenode:/data/hadoop
+    environment:
+      - PS1_=namenode
+    env_file:
+      - $HOME/hadoop-test/hadoop.env
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://127.0.0.1:50070/", "||", "exit", "1"]
+    command: namenode
+
+#  secondarynamenode:
+#    tty: true
+#    image: longe/hadoop:2.7.7
+#    container_name: hadoop-nn2
+#    hostname: hadoop-nn2
+#    ports:  ["50090:50090"]
+#    volumes:
+#      - $HOME/hadoop-test/namenode2:/data/hadoop
+#    environment:
+#      - PS1_=secondarynamenode
+#    env_file:
+#      - $HOME/hadoop-test/hadoop.env
+#    command: secondarynamenode
+
+  datanode-1:
+    tty: true
+    image: longe/hadoop:2.7.7
+    container_name: hadoop-dn-1
+    hostname: hadoop-dn-1
+    expose: ["50010", "50020", "50075"]
+    depends_on:
+      - namenode
+    volumes:
+      - $HOME/hadoop-test/datanode-1:/data/hadoop
+    environment:
+      - PS1_=datanode-1
+    env_file:
+      - $HOME/hadoop-test/hadoop.env
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://127.0.0.1:50075/", "||", "exit", "1"]
+    command: datanode
+
+  nodemanager-1:
+    tty: true
+    image: longe/hadoop:2.7.7
+    container_name: hadoop-nm-1
+    hostname: hadoop-nm-1
+    expose: ["8040", "8042"]
+    depends_on:
+      - namenode
+      - datanode-1
+    volumes:
+      - $HOME/hadoop-test/datanode-1:/data/hadoop
+    environment:
+      - PS1_=nodemanager-1
+    env_file:
+      - $HOME/hadoop-test/hadoop.env
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://127.0.0.1:8042/", "||", "exit", "1"]
+    command: nodemanager
+
+  datanode-2:
+    tty: true
+    image: longe/hadoop:2.7.7
+    container_name: hadoop-dn-nm-2
+    hostname: hadoop-dn-nm-2
+    expose: ["50010", "50020", "50075","8040", "8042"]
+    depends_on:
+      - namenode
+    volumes:
+      - $HOME/hadoop-test/datanode-2:/data/hadoop
+    environment:
+      - PS1_=datanode-2
+    env_file:
+      - $HOME/hadoop-test/hadoop.env
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://127.0.0.1:50075/", "||", "exit", "1"]
+    command: datanode,nodemanager
+
+  resourcemanager:
+    tty: true
+    image: longe/hadoop:2.7.7
+    container_name: hadoop-rm
+    hostname: hadoop-rm
+    expose: ["8030-8033"]
+    ports:  ["8088:8088"]
+    depends_on:
+      - namenode
+      - datanode-1
+      - datanode-2
+    volumes:
+      - $HOME/hadoop-test/resourcemanager:/data/hadoop
+    environment:
+      - PS1_=resourcemanager
+    env_file:
+      - $HOME/hadoop-test/hadoop.env
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://127.0.0.1:8088/", "||", "exit", "1"]
+    command: resourcemanager
+
+  historyserver:
+    tty: true
+    image: longe/hadoop:2.7.7
+    container_name: hadoop-jhs
+    hostname: hadoop-jhs
+    expose: ["10020"]
+    ports:  ["8188:8188", "19888:19888"]
+    depends_on:
+      - namenode
+      - datanode-1
+      - datanode-2
+      - resourcemanager
+    volumes:
+      - $HOME/hadoop-test/historyserver:/data/hadoop
+    environment:
+      - PS1_=historyserver
+    env_file:
+      - $HOME/hadoop-test/hadoop.env
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://127.0.0.1:8188/", "||", "exit", "1"]
+    command: historyserver,timelineserver

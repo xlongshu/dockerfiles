@@ -1,38 +1,36 @@
-FROM longe/java:8-alpine
+ARG FROM_IMG=java
+ARG FROM_TAG=8-alpine
+FROM longe/${FROM_IMG}:${FROM_TAG}
 
-LABEL version="1.0"
 LABEL maintainer="xlongshu@163.com"
 
-EXPOSE 22
-# NameNode (hdfs)
-EXPOSE 8020 50070
-# DataNode (hdfs)
-EXPOSE 50010 50020 50075
-# ResourceManager (yarn)
-EXPOSE 8030 8031 8032 8033 8088
-# NodeManager (yarn)
-EXPOSE 8040 8042
-# JobHistoryServer (mapred)
-EXPOSE 10020 19888
+# NameNode (hdfs) 8020 50070
+# DataNode (hdfs) 50010 50020 50075
+# ResourceManager (yarn) 8030 8031 8032 8033 8088
+# NodeManager (yarn) 8040 8042
+# JobHistoryServer (mapred) 8188 10020 19888
+#EXPOSE 50070 50075 8042 8088
 
-# --build-arg HADOOP_VERSION=3.1.2 DL_SERVER=http://mirrors.aliyun.com/apache
+VOLUME /data/hadoop
+
+# --build-arg HADOOP_VERSION=3.1.3 --build-arg MIRROR_APACHE=http://mirrors.aliyun.com/apache
 ARG HADOOP_VERSION="2.7.7"
-#ARG DL_SERVER="http://archive.apache.org/dist"
-
-# add local file
-ADD "hadoop-$HADOOP_VERSION.tar.gz" /opt/
-
-#ENV HADOOP_URL=$DL_SERVER/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-#RUN set -x \
-#    && curl --silent --head $HADOOP_URL | head -n 1
-#    && curl -fSL "$HADOOP_URL" -o /tmp/hadoop.tar.gz \
-#    && tar -xvf /tmp/hadoop.tar.gz -C /opt/ \
-#    && rm /tmp/hadoop.tar.gz*
+ARG MIRROR_APACHE="http://archive.apache.org/dist"
 
 RUN set -xe \
     && apk update && apk upgrade \
-    && apk add openssh xmlstarlet \
+    && apk add openssh busybox-extras tree \
     && rm -rf /var/cache/apk/*
+
+ENV HADOOP_URL=$MIRROR_APACHE/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+#RUN set -x \
+#    && curl --silent --head $HADOOP_URL | head -n 1 \
+#    && curl -fSL "$HADOOP_URL" -o /tmp/hadoop.tar.gz \
+#    && tar -xvf /tmp/hadoop.tar.gz -C /opt/ \
+#    && rm -f /tmp/hadoop.tar.gz
+
+# add local file
+ADD "hadoop-$HADOOP_VERSION.tar.gz" /opt/
 
 # configure SSH
 RUN set -xe \
@@ -48,27 +46,30 @@ ADD ssh_config /root/.ssh/config
 
 ENV USER=root
 ENV HADOOP_PREFIX="/opt/hadoop-$HADOOP_VERSION" \
-    YARN_CONF_DIR="${HADOOP_CONF_DIR}" \
-    HADOOP_CONF_DIR="/etc/hadoop" \
     HADOOP_HOME="/opt/hadoop" \
+    HADOOP_CONF_DIR="/etc/hadoop" \
     HADOOP_DATA_PREFIX="/data/hadoop"
 
 ENV PATH $HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+ENV _PS1="docker-hadoop-$HADOOP_VERSION"
 
 RUN set -xe \
     && ln -s $HADOOP_PREFIX $HADOOP_HOME \
     && rm -rf $HADOOP_PREFIX/share/doc \
-    && mkdir -p $HADOOP_CONF_DIR $HADOOP_HOME/logs $HADOOP_DATA_PREFIX
+    && mkdir -p $HADOOP_CONF_DIR $HADOOP_HOME/logs $HADOOP_DATA_PREFIX \
+    && mkdir -p ${HADOOP_DATA_PREFIX}/dfs/{data,name,namesecondary} ${HADOOP_DATA_PREFIX}/yarn/timeline
 RUN cp $HADOOP_HOME/etc/hadoop/mapred-site.xml.template $HADOOP_HOME/etc/hadoop/mapred-site.xml
 RUN sed -i 's@${JAVA_HOME}@'/usr/lib/jvm/default-jvm'@g' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 #RUN sed -i "/^export JAVA_HOME/ s:.*:export JAVA_HOME=${JAVA_HOME}:" ${HADOOP_CONF_DIR}/hadoop-env.sh
 
-COPY hadoopd.sh /opt/hadoopd.sh
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod a+x /opt/hadoopd.sh
-RUN chmod a+x /entrypoint.sh
+# test hadoop
+RUN set -eux; $HADOOP_PREFIX/bin/hadoop version
 
-ENTRYPOINT ["/entrypoint.sh"]
-#CMD ["namenode"]
-#CMD [ "sh", "-c", "/usr/sbin/sshd; /bin/bash"]
-# /usr/sbin/sshd -D
+COPY docker_hadoop.sh /docker_hadoop.sh
+RUN chmod +x /docker_hadoop.sh
+
+COPY shell/*.sh /opt/
+RUN chmod +x /opt/*.sh
+
+ENTRYPOINT ["/docker_hadoop.sh"]
+CMD ["sshd"]
