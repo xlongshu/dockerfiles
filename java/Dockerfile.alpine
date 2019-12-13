@@ -10,6 +10,7 @@ RUN set -xe \
 
 ENV JAVA_HOME="/usr/lib/jvm/default-jvm"
 ENV PATH $JAVA_HOME/bin:$PATH
+ENV _PS1="docker-java-alpine"
 
 RUN { echo '#!/bin/sh'; echo 'set -e'; echo 'echo "$JAVA_HOME"'; } > /usr/local/bin/docker-java-home && chmod +x /usr/local/bin/docker-java-home
 RUN { echo '#!/bin/sh'; echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; } > /usr/local/bin/java-home \

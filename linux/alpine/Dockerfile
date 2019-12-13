@@ -9,7 +9,7 @@ ARG MIRROR_ALPINE=""
 RUN set -xe \
     && if [[ ${MIRROR_ALPINE} ]]; then sed -i "s@dl-cdn.alpinelinux.org@${MIRROR_ALPINE}@g" /etc/apk/repositories; fi \
     && apk update && apk upgrade \
-    && apk add tzdata file procps ca-certificates curl \
+    && apk add tzdata file tree procps ca-certificates curl telnet \
     && rm -rf /var/cache/apk/*
 
 ENV TZ=Asia/Shanghai

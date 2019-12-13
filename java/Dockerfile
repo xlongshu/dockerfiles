@@ -18,6 +18,7 @@ RUN set -xe \
 
 ENV JAVA_HOME="/usr/lib/jvm/java-${ARG_JAVA_VER}-openjdk-amd64"
 ENV PATH $JAVA_HOME/bin:$PATH
+ENV _PS1="docker-java-${ARG_JAVA_VER}"
 
 RUN ln -s $JAVA_HOME /usr/lib/jvm/default-jvm
 RUN { echo '#!/bin/sh'; echo 'set -e'; echo 'echo "$JAVA_HOME"'; } > /usr/local/bin/docker-java-home && chmod +x /usr/local/bin/docker-java-home

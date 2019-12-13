@@ -14,7 +14,7 @@ RUN set -xe; \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    locales tzdata file psmisc iputils-ping net-tools ca-certificates curl netbase \
+    locales tzdata file tree psmisc iputils-ping net-tools ca-certificates curl netbase telnet \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
