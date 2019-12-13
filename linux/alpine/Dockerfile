@@ -18,16 +18,16 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV LANG=en_US.UTF-8
 
 ENV PATH $PATH:.
+ENV _PS1="docker-alpine"
+ENV PS1='[\u@\h:\w]\$ '
 
 # configure
 RUN set -xe \
     && echo "root:`date -R|sha256sum|base64|head -c 12`" | chpasswd \
-    && echo $'\
-export PS1=\'[\u@\h \w]\\$ \'\n\
-alias ll="ls -alF"\n\
-alias la="ls -A"\n\
-alias l="ls -CF"\n'\
->> $HOME/.bashrc
+    && echo 'set completion-ignore-case on' >> $HOME/.inputrc \
+    && echo 'set show-all-if-ambiguous on' >> $HOME/.inputrc \
+    && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
 
+ADD shell_env.sh /root/
 
 CMD ["/bin/sh"]

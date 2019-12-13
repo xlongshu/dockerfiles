@@ -41,3 +41,24 @@ mirrors.aliyun.com
 mirrors.ustc.edu.cn
 mirrors.163.com
 ```
+
+- PS1
+```bash
+export _PS1=${_PS1:-"docker"}
+export PS1_=${PS1_:-""}
+export PS1PS1=${PS1:-'[\u@\h:\w]\$ '}
+PS1='\n${_PS1:+($_PS1)}'"$PS1PS1"'\n${PS1_:+$PS1_}\$ '
+
+
+# add to $HOME/.bashrc
+echo $'
+export _PS1=${_PS1:-""}
+export PS1_=${PS1_:-""}
+export PS1PS1=${PS1PS1:-${PS1:-\'[\u@\h:\w]\$ \'}}
+export PS1=\'\\n${_PS1:+($_PS1)}\'"$PS1PS1"\'\\n${PS1_:+$PS1_}\$ \'
+' >> $HOME/.bashrc
+
+source $HOME/.bashrc
+
+
+```

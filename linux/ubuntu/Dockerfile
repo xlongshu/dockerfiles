@@ -28,5 +28,14 @@ RUN set -x \
 ENV LANG=en_US.UTF-8
 
 ENV PATH $PATH:.
+ENV _PS1="docker-ubuntu"
+
+# configure
+RUN set -xe \
+    && echo 'set completion-ignore-case on' >> $HOME/.inputrc \
+    && echo 'set show-all-if-ambiguous on' >> $HOME/.inputrc \
+    && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
+
+ADD shell_env.sh /root/
 
 CMD ["/bin/bash"]
