@@ -19,7 +19,7 @@ services:
     environment:
       - PS1_=namenode
     env_file:
-      - $HOME/hadoop-test/hadoop.env
+      - ./hadoop.env
 #    healthcheck:
 #      test: ["CMD", "curl", "-f", "http://127.0.0.1:50070/", "||", "exit", "1"]
     command: namenode
@@ -35,7 +35,7 @@ services:
 #    environment:
 #      - PS1_=secondarynamenode
 #    env_file:
-#      - $HOME/hadoop-test/hadoop.env
+#      - ./hadoop.env
 #    command: secondarynamenode
 
   datanode-1:
@@ -51,7 +51,7 @@ services:
     environment:
       - PS1_=datanode-1
     env_file:
-      - $HOME/hadoop-test/hadoop.env
+      - ./hadoop.env
 #    healthcheck:
 #      test: ["CMD", "curl", "-f", "http://127.0.0.1:50075/", "||", "exit", "1"]
     command: datanode
@@ -70,7 +70,7 @@ services:
     environment:
       - PS1_=nodemanager-1
     env_file:
-      - $HOME/hadoop-test/hadoop.env
+      - ./hadoop.env
 #    healthcheck:
 #      test: ["CMD", "curl", "-f", "http://127.0.0.1:8042/", "||", "exit", "1"]
     command: nodemanager
@@ -88,7 +88,7 @@ services:
     environment:
       - PS1_=datanode-2
     env_file:
-      - $HOME/hadoop-test/hadoop.env
+      - ./hadoop.env
 #    healthcheck:
 #      test: ["CMD", "curl", "-f", "http://127.0.0.1:50075/", "||", "exit", "1"]
     command: datanode,nodemanager
@@ -109,7 +109,7 @@ services:
     environment:
       - PS1_=resourcemanager
     env_file:
-      - $HOME/hadoop-test/hadoop.env
+      - ./hadoop.env
 #    healthcheck:
 #      test: ["CMD", "curl", "-f", "http://127.0.0.1:8088/", "||", "exit", "1"]
     command: resourcemanager
@@ -131,7 +131,7 @@ services:
     environment:
       - PS1_=historyserver
     env_file:
-      - $HOME/hadoop-test/hadoop.env
+      - ./hadoop.env
 #    healthcheck:
 #      test: ["CMD", "curl", "-f", "http://127.0.0.1:8188/", "||", "exit", "1"]
     command: historyserver,timelineserver

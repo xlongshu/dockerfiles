@@ -11,16 +11,17 @@ VOLUME /data/hive
 ARG HIVE_VERSION="2.3.4"
 ARG MIRROR_APACHE="http://archive.apache.org/dist"
 
+WORKDIR /opt/
+
 ENV HIVE_URL=$MIRROR_APACHE/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz
-#RUN set -x \
-#    && curl --silent --head $HIVE_URL | head -n 1 \
-#    && curl -fSL "$HIVE_URL" -o /tmp/hive.tar.gz \
-#    && tar -xvf /tmp/hive.tar.gz -C /opt/ \
-#    && rm -f /tmp/hive.tar.gz
+RUN set -x \
+    && curl --silent --head $HIVE_URL | head -n 1 \
+    && curl -fSL "$HIVE_URL" -o apache-hive-$HIVE_VERSION-bin.tar.gz \
+    && tar -zxf apache-hive-$HIVE_VERSION-bin.tar.gz -C /opt/ \
+    && rm -f apache-hive-$HIVE_VERSION-bin.tar.gz
 
 # add local file
-ADD "apache-hive-$HIVE_VERSION-bin.tar.gz" /opt/
-#ADD "https://raw.githubusercontent.com/apache/hive/master/bin/init-hive-dfs.sh" /opt/
+#ADD "apache-hive-$HIVE_VERSION-bin.tar.gz" /opt/
 
 ENV HIVE_PREFIX="/opt/apache-hive-$HIVE_VERSION-bin" \
     HIVE_HOME="/opt/hive" \

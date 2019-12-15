@@ -80,7 +80,7 @@ $HADOOP_EXEC fs -test -d ${TMP_DIR} > /dev/null 2>&1
 if [ $? -ne 0 ] 
 then
   echo "Creating directory [${TMP_DIR}]"
-  $HADOOP_EXEC fs -mkdir ${TMP_DIR}
+  $HADOOP_EXEC fs -mkdir -p ${TMP_DIR}
 fi
 
 echo "Setting writeable group rights for directory [${TMP_DIR}]"
@@ -92,7 +92,7 @@ $HADOOP_EXEC fs -test -d ${WAREHOUSE_DIR} > /dev/null 2>&1
 if [ $? -ne 0 ] 
 then
   echo "Creating directory [${WAREHOUSE_DIR}]"
-  $HADOOP_EXEC fs -mkdir ${WAREHOUSE_DIR}
+  $HADOOP_EXEC fs -mkdir -p ${WAREHOUSE_DIR}
 fi
 
 echo "Setting writeable group rights for directory [${WAREHOUSE_DIR}]"

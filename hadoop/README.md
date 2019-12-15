@@ -15,6 +15,7 @@ longe/hadoop:2.7.7 namenode,datanode,nodemanager,resourcemanager,historyserver
 
 ## Fully-Distributed
 # docker-compose.yml
+docker network create --driver=bridge hadoop
 docker-compose up -d
 
 ```

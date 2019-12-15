@@ -19,10 +19,11 @@ set -e
 set -o pipefail
 
 echo "Init ${HIVE_CONF_DIR}"
-cp -u ${HIVE_HOME}/conf/beeline-log4j2.properties.template ${HIVE_CONF_DIR}/beeline-log4j2.properties
-cp -u ${HIVE_HOME}/conf/hive-exec-log4j2.properties.template ${HIVE_CONF_DIR}/hive-exec-log4j2.properties
-cp -u ${HIVE_HOME}/conf/hive-log4j2.properties.template ${HIVE_CONF_DIR}/hive-log4j2.properties
-cp -u ${HIVE_HOME}/conf/llap-daemon-log4j2.properties.template ${HIVE_CONF_DIR}/llap-daemon-log4j2.properties
+mkdir -p "${HIVE_CONF_DIR}" "${HADOOP_CONF_DIR}"
+for conf in $(ls -1 ${HIVE_HOME}/conf/*.properties.template); do
+  cp -u ${conf} ${conf%.*}
+done
+cp -u ${HIVE_HOME}/conf/*.properties ${HIVE_CONF_DIR}/
 cp -u ${HIVE_HOME}/conf/hive-env.sh.template ${HIVE_CONF_DIR}/hive-env.sh
 cp -u ${HIVE_HOME}/conf/ivysettings.xml ${HIVE_CONF_DIR}/ivysettings.xml
 
@@ -68,10 +69,11 @@ done
 
 mkdir -p /data/hive && cd /data/hive
 # test
-#if [[ ! -d /data/hive/metastore_db ]]; then
-#  "$HIVE_HOME/bin/schematool" -initSchema -dbType derby
-#fi
-if [[ -n "${HIVE_DBTYPE}" ]]; then
+if [[ ! -d /data/hive/metastore_db ]]; then
+  "$HIVE_HOME/bin/schematool" -initSchema -dbType derby
+fi
+# init metastore
+if [[ -n "${HIVE_DBTYPE}" && "${HIVE_DBTYPE}" != "derby" ]]; then
   echo "initSchema: ${HIVE_DBTYPE}"
   "$HIVE_HOME/bin/schematool" -dbType ${HIVE_DBTYPE} -initSchema
 fi
