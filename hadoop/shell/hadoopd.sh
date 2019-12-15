@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # hadoopd.sh
 
-HADOOP_PREFIX=${HADOOP_PREFIX:-"/opt/hadoop"}
+HADOOP_HOME=${HADOOP_HOME:-"/opt/hadoop"}
 HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/etc/hadoop"}
 
 # hdfs namenode -format
@@ -20,16 +20,16 @@ hadoop_daemon() {
       /usr/sbin/sshd
     ;;
     historyserver)
-      "$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh" "$startStop" historyserver
+      "$HADOOP_HOME/sbin/mr-jobhistory-daemon.sh" "$startStop" historyserver
     ;;
     resourcemanager | nodemanager | proxyserver | timelineserver)
-      "$HADOOP_PREFIX/sbin/yarn-daemon.sh" "$startStop" "$name"
+      "$HADOOP_HOME/sbin/yarn-daemon.sh" "$startStop" "$name"
     ;;
     namenode | secondarynamenode | datanode | journalnode | dfs | dfsadmin | fsck | balancer | zkfc)
       if [[ "namenode" == "$name" ]]; then
         hadoop_format_namenode
       fi
-      "$HADOOP_PREFIX/sbin/hadoop-daemon.sh" "$startStop" "$name"
+      "$HADOOP_HOME/sbin/hadoop-daemon.sh" "$startStop" "$name"
     ;;
   esac
 }
@@ -61,7 +61,7 @@ stop_hadoops() {
 
 # hadoopd.sh (start|stop) <hadoop-command>
 # hadoopd.sh start namenode,datanode,resourcemanager,nodemanager
-if [[ $# -gt 1 ]] && [[ "$1" == "start" || "$1" == "stop" ]]; then
+if [[ $# -gt 1 && "$1" != "--" ]] && [[ "$1" == "start" || "$1" == "stop" ]]; then
   $1_hadoops $2
 else
   echo "Usage: hadoopd.sh (start|stop) <hadoop-command>"

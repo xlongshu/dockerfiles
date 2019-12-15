@@ -15,11 +15,11 @@ function env2conf() {
     local keyname=$(echo ${e} | awk -F "=" '{print $1}') # get key
     # revert: - <== ___; _ <== __; . <== _;
     local key=$(echo ${keyname} | sed -e "s/^${envPrefix}_//" -e 's/___/-/g; s/__/@/g; s/_/./g; s/@/_/g;')
-    local val=${!keyname} # get from env
+    local val="${!keyname}" # get from env
     if [[ "$fileExt" == "xml" ]]; then
-      add2xml ${filePath} ${key} ${val}
+      add2xml ${filePath} ${key} "${val}"
     else
-      add2conf ${filePath} ${key} ${val}
+      add2conf ${filePath} ${key} "${val}"
     fi
     #unset "${keyname}"
   done

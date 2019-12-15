@@ -9,17 +9,16 @@ else
   cat /etc/issue
 fi
 
-
-export HADOOP_PREFIX=${HADOOP_PREFIX:-"/opt/hadoop"}
+export HADOOP_HOME=${HADOOP_HOME:-"/opt/hadoop"}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/etc/hadoop"}
-export HADOOP_COMMON_LIB_NATIVE_DIR=${HADOOP_PREFIX}/lib/native
+export HADOOP_COMMON_LIB_NATIVE_DIR=${HADOOP_HOME}/lib/native
 export LD_LIBRARY_PATH=${HADOOP_COMMON_LIB_NATIVE_DIR}:${LD_LIBRARY_PATH}
 
 set -e
 set -o pipefail
 
 echo "Init ${HADOOP_CONF_DIR}"
-awk 'BEGIN { copy="cp -Ri ${HADOOP_PREFIX}/etc/hadoop/* ${HADOOP_CONF_DIR}/"; print "n" |copy; }'
+awk 'BEGIN { copy="cp -Ri ${HADOOP_HOME}/etc/hadoop/* ${HADOOP_CONF_DIR}/"; print "n" |copy; }'
 
 ## Set some sensible defaults
 # core-site.xml

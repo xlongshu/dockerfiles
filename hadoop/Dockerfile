@@ -25,15 +25,20 @@ RUN set -xe \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /opt/
+
+#http://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+#http://www.apache.org/dyn/closer.cgi?action=download&filename=hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 ENV HADOOP_URL=$MIRROR_APACHE/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-#RUN set -x \
-#    && curl --silent --head $HADOOP_URL | head -n 1 \
-#    && curl -fSL "$HADOOP_URL" -o /tmp/hadoop.tar.gz \
-#    && tar -xvf /tmp/hadoop.tar.gz -C /opt/ \
-#    && rm -f /tmp/hadoop.tar.gz
+RUN set -x \
+    && curl --silent --head $HADOOP_URL | head -n 1 \
+    && curl -fSL "$HADOOP_URL" -o hadoop-$HADOOP_VERSION.tar.gz \
+    && tar -zxf hadoop-$HADOOP_VERSION.tar.gz -C /opt/ \
+    && rm -f hadoop-$HADOOP_VERSION.tar.gz \
+    && rm -rf /opt/hadoop-$HADOOP_VERSION/share/doc
 
 # add local file
-ADD "hadoop-$HADOOP_VERSION.tar.gz" /opt/
+#ADD "hadoop-$HADOOP_VERSION.tar.gz" /opt/
 
 # configure SSH
 RUN set -xe \
@@ -59,7 +64,7 @@ RUN set -xe \
     && rm -rf $HADOOP_PREFIX/share/doc \
     && mkdir -p $HADOOP_CONF_DIR $HADOOP_HOME/logs $HADOOP_DATA_PREFIX \
     && mkdir -p ${HADOOP_DATA_PREFIX}/dfs/{data,name,namesecondary} ${HADOOP_DATA_PREFIX}/yarn/timeline
-RUN cp $HADOOP_HOME/etc/hadoop/mapred-site.xml.template $HADOOP_HOME/etc/hadoop/mapred-site.xml
+
 RUN sed -i 's@${JAVA_HOME}@'/usr/lib/jvm/default-jvm'@g' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 #RUN sed -i "/^export JAVA_HOME/ s:.*:export JAVA_HOME=${JAVA_HOME}:" ${HADOOP_CONF_DIR}/hadoop-env.sh
 
