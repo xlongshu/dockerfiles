@@ -2,6 +2,8 @@
 ## hadoop
 
 ### Quick Start
+
+- [Pseudo-Distributed](https://hadoop.apache.org/docs/stable2/hadoop-project-dist/hadoop-common/SingleCluster.html#Pseudo-Distributed_Operation)
 ```bash
 ## Pseudo-Distributed
 docker run --rm -it \
@@ -10,9 +12,12 @@ docker run --rm -it \
 -v `pwd`/test/data:/data/hadoop \
 -e PS1_=hadoop \
 --name hadoop-server -h hadoop-server \
-longe/hadoop:2.7.7 namenode,datanode,nodemanager,resourcemanager,historyserver
+longe/hadoop:2.7.7 namenode,secondarynamenode,datanode,nodemanager,resourcemanager,historyserver
 
+```
 
+- [Fully-Distributed](https://hadoop.apache.org/docs/stable2/hadoop-project-dist/hadoop-common/ClusterSetup.html)
+```bash
 ## Fully-Distributed
 # docker-compose.yml
 docker network create --driver=bridge hadoop

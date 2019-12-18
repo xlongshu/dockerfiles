@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # hadoopd.sh
 
 HADOOP_HOME=${HADOOP_HOME:-"/opt/hadoop"}
@@ -48,6 +49,12 @@ start_hadoops() {
   local services=( ${1//,/ } )
   for name in "${services[@]}"; do
     [[ -n ${name} ]] && hadoop_daemon start "$name"
+    if [[ "namenode" == "$name" ]]; then
+      echo "Creating directory /tmp ..."
+      sleep 5
+      hadoop fs -test -d /tmp/test || hadoop fs -mkdir -p /tmp/test
+      hadoop fs -test -e /tmp && hadoop fs -chmod 777 /tmp
+    fi
   done
 }
 
@@ -62,7 +69,7 @@ stop_hadoops() {
 # hadoopd.sh (start|stop) <hadoop-command>
 # hadoopd.sh start namenode,datanode,resourcemanager,nodemanager
 if [[ $# -gt 1 && "$1" != "--" ]] && [[ "$1" == "start" || "$1" == "stop" ]]; then
-  $1_hadoops $2
+  $1_hadoops "$2"
 else
   echo "Usage: hadoopd.sh (start|stop) <hadoop-command>"
 fi
