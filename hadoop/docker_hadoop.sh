@@ -62,7 +62,14 @@ done
 
 
 source /opt/hadoopd.sh "--"
+source /opt/wait_until.sh
 
+echo "Waiting services:[${WAIT_UNTIL_SERVER}] ..."
+for ws in ${WAIT_UNTIL_SERVER[@]}; do
+  wait_until_server ${ws}
+done
+
+set -e
 export RUN_SERVICE="$1"
 echo "services: $RUN_SERVICE"
 start_hadoops "${RUN_SERVICE}"

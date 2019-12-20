@@ -7,38 +7,62 @@ networks:
       name: hadoop
 
 services:
-  hive-server:
-    tty: true
+  hiveserver2:
     image: longe/hive:2.3.4
-    hostname: hive-server
-    networks: ["hadoop"]
+    container_name: hive-hiveserver2
+    hostname: hive-hiveserver2
     ports:  ["10000:10000", "10002:10002"]
     depends_on:
-      - hive-metastore
-      - hive-metastore_db
+      - metastore
+    volumes:
+      - $HOME/hive_data/hiveserver2:/data/hive
     environment:
       - PS1_=hiveserver2
+      - WAIT_UNTIL_SERVER=hive-metastore:9083
     env_file:
       - ./hive.env
     command: hiveserver2
 
-  hive-metastore:
-    tty: true
+  metastore:
     image: longe/hive:2.3.4
+    container_name: hive-metastore
     hostname: hive-metastore
-    networks: ["hadoop"]
     ports:  ["9083:9083"]
     depends_on:
-      - hive-metastore_db
+      - metastore_db_postgres
+    volumes:
+      - $HOME/hive_data/metastore:/data/hive
     environment:
       - PS1_=metastore
     env_file:
       - ./hive.env
     command: metastore
 
-  hive-metastore_db:
+  metastore_db_postgres:
     image: postgres:9-alpine
-    networks: ["hadoop"]
-    expose: ["5432"]
+    container_name: hive-metastore_db_postgres
+    ports:  ["5432:54320"]
+    volumes:
+      - $HOME/hive_data/hive_postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: hive123456
+      - POSTGRES_DB=metastore_db
+      - POSTGRES_USER=hive
+      - POSTGRES_PASSWORD=hive123456
+
+#  metastore_db_mysql:
+#    image: mysql:5.6
+#    container_name: hive-metastore_db_mysql
+#    ports: ["3306:33060"]
+#    volumes:
+#      - $HOME/hive_data/hive_mysql:/var/lib/mysql
+#    environment:
+#      - MYSQL_DATABASE=metastore_db
+#      - MYSQL_USER=hive
+#      - MYSQL_PASSWORD=hive123456
+#
+#  metastore_db_derby:
+#    image: az82/docker-derby:v1.3
+#    container_name: hive-metastore_db_derby
+#    ports: ["1527:15270"]
+#    volumes:
+#      - $HOME/hive_data/hive_derby:/dbs

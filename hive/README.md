@@ -8,12 +8,12 @@ docker run --rm -it \
 -p 10000:10000 -p 10002:10002 \
 -v `pwd`/test:/etc/hive \
 -v `pwd`/test:/data/hive \
--e PS1_=hive \
 --network hadoop \
 --env-file `pwd`/hive-test.env \
 --name hive-test -h hive-test \
 longe/hive:2.3.4 
 
+docker exec -it hive-test beeline
 
 # docker-compose.yml
 docker-compose up -d
@@ -60,4 +60,14 @@ docker build -t longe/hive:1.2.2-hadoop-2.7.7-openjdk-8 ./ --build-arg FROM_TAG=
 # hadoop-2.7.7, hive:2.3.4
 docker build -t longe/hive:2.3.4-hadoop-2.7.7-openjdk-8 ./ --build-arg FROM_TAG=2.7.7-openjdk-8 --build-arg HIVE_VERSION=2.3.4
 
+```
+
+- Hive Docs
+```text
+https://cwiki.apache.org/confluence/display/Hive/GettingStarted
+https://cwiki.apache.org/confluence/display/Hive/Hive+Schema+Tool
+https://cwiki.apache.org/confluence/display/Hive/HiveServer2+Clients
+https://cwiki.apache.org/confluence/display/Hive/Setting+Up+HiveServer2
+https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties
+https://cwiki.apache.org/confluence/display/Hive/HiveDerbyServerMode
 ```

@@ -4,6 +4,7 @@
 ### Quick Start
 
 - [Pseudo-Distributed](https://hadoop.apache.org/docs/stable2/hadoop-project-dist/hadoop-common/SingleCluster.html#Pseudo-Distributed_Operation)
+
 ```bash
 ## Pseudo-Distributed
 docker run --rm -it \
@@ -12,11 +13,12 @@ docker run --rm -it \
 -v `pwd`/test/data:/data/hadoop \
 -e PS1_=hadoop \
 --name hadoop-server -h hadoop-server \
-longe/hadoop:2.7.7 namenode,secondarynamenode,datanode,nodemanager,resourcemanager,historyserver
+longe/hadoop:2.7.7 namenode,secondarynamenode,datanode,resourcemanager,nodemanager,historyserver
 
 ```
 
 - [Fully-Distributed](https://hadoop.apache.org/docs/stable2/hadoop-project-dist/hadoop-common/ClusterSetup.html)
+
 ```bash
 ## Fully-Distributed
 # docker-compose.yml
@@ -38,7 +40,6 @@ docker tag longe/hadoop:2.7.7 longe/hadoop:2.7.7-java-8-bionic
 docker build -t longe/hadoop:3.1.3 ./ --build-arg HADOOP_VERSION=3.1.3
 docker tag longe/hadoop:3.1.3 longe/hadoop:3.1.3-bionic
 docker tag longe/hadoop:3.1.3 longe/hadoop:3.1.3-java-8-bionic
-
 ## 16.04 xenial
 #java-8, hadoop:2.7.7
 docker build -t longe/hadoop:2.7.7-xenial ./ --build-arg FROM_TAG=8-xenial --build-arg HADOOP_VERSION=2.7.7
@@ -57,7 +58,6 @@ docker tag longe/hadoop:2.7.7-openjdk-8 longe/hadoop:2.7.7-openjdk-8-stretch
 #openjdk-8, hadoop:3.1.3
 docker build -t longe/hadoop:3.1.3-openjdk-8 ./ --build-arg FROM_IMG=openjdk --build-arg FROM_TAG=8-jdk --build-arg HADOOP_VERSION=3.1.3
 docker tag longe/hadoop:3.1.3-openjdk-8 longe/hadoop:2.7.7-openjdk-8-stretch
-
 # 9 stretch, java-8, hadoop 2.7.7
 docker build -t longe/hadoop:2.7.7-java-8-stretch ./ --build-arg FROM_TAG=8-stretch --build-arg HADOOP_VERSION=2.7.7
 ```

@@ -4,6 +4,7 @@
 
 HADOOP_HOME=${HADOOP_HOME:-"/opt/hadoop"}
 HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/etc/hadoop"}
+HADOOP_HDFS_INIT=${HADOOP_HDFS_INIT:-"hdfs dfs -ls /"}
 
 # hdfs namenode -format
 # hadoop-daemon.sh start <namenode|secondarynamenode|datanode|journalnode|dfs|dfsadmin|fsck|balancer|zkfc>
@@ -45,15 +46,43 @@ hadoop_format_namenode() {
   fi
 }
 
+hadoop_dfs_init() {
+  set +o pipefail
+  echo "Init dfs ..."
+  local address=$(hdfs getconf -confKey fs.defaultFS)
+  local hostname=$(echo "${address}" | awk -F'[/:]' '{print $4}')
+  local port=$(echo "${address}" | awk -F'[/:]' '{print $5}')
+  local result=1
+  for i in $(seq 30); do
+    echo "Waiting namenode ${address} up ... with retry count: ${i}"
+    if command -v nc > /dev/null; then
+      echo "Checking nc ${hostname} ${port} ..."
+      result=$(nc -z -w 2 ${hostname} ${port} && echo 0 || echo 1)
+    elif command -v telnet > /dev/null; then
+      echo "Checking telnet ${hostname} ${port} ..."
+      result=$(echo quit | timeout 2 telnet ${hostname} ${port} 2>&1 | grep -q Connected && echo 0 || echo 1)
+    fi
+    if [[ ${result} -eq 0 ]]; then
+      echo "namenode ${address} is available."
+      break
+    fi
+    sleep 2
+  done
+  echo "Creating directory /tmp ..."
+  hadoop fs -test -d /tmp/init || hadoop fs -mkdir -p /tmp/init
+  hadoop fs -test -e /tmp && hadoop fs -chmod 777 /tmp
+  if [[ -n ${HADOOP_HDFS_INIT} ]]; then
+    echo "exec HADOOP_HDFS_INIT:[${HADOOP_HDFS_INIT}]"
+    eval "${HADOOP_HDFS_INIT}"
+  fi
+}
+
 start_hadoops() {
   local services=( ${1//,/ } )
   for name in "${services[@]}"; do
     [[ -n ${name} ]] && hadoop_daemon start "$name"
     if [[ "namenode" == "$name" ]]; then
-      echo "Creating directory /tmp ..."
-      sleep 5
-      hadoop fs -test -d /tmp/test || hadoop fs -mkdir -p /tmp/test
-      hadoop fs -test -e /tmp && hadoop fs -chmod 777 /tmp
+      hadoop_dfs_init &
     fi
   done
 }
@@ -68,8 +97,10 @@ stop_hadoops() {
 
 # hadoopd.sh (start|stop) <hadoop-command>
 # hadoopd.sh start namenode,datanode,resourcemanager,nodemanager
-if [[ $# -gt 1 && "$1" != "--" ]] && [[ "$1" == "start" || "$1" == "stop" ]]; then
-  $1_hadoops "$2"
-else
-  echo "Usage: hadoopd.sh (start|stop) <hadoop-command>"
+if [[ $# -gt 1 && "$1" != "--" ]]; then
+  if [[ "$1" == "start" || "$1" == "stop" ]]; then
+    $1_hadoops "$2"
+  else
+    echo "Usage: hadoopd.sh (start|stop) <hadoop-command>"
+  fi
 fi

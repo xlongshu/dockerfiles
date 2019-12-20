@@ -21,7 +21,7 @@ RUN set -xe \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    openssh-client openssh-server telnet tree \
+    openssh-client openssh-server telnet netcat tree \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

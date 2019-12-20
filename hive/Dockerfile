@@ -33,10 +33,10 @@ ENV _PS1="docker-hive-$HIVE_VERSION"
 RUN set -xe \
     && ln -s $HIVE_PREFIX $HIVE_HOME \
     && mkdir -p $HIVE_CONF_DIR \
-    && mkdir -p "/data/hive" \
     # download jdbc driver
     && curl -fSL "http://central.maven.org/maven2/org/postgresql/postgresql/42.2.5/postgresql-42.2.5.jar" -o "${HIVE_HOME}/lib/postgresql-42.2.5.jar" \
-    && curl -fSL "http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.40/mysql-connector-java-5.1.40.jar" -o "${HIVE_HOME}/lib/mysql-connector-java-5.1.40.jar"
+    && curl -fSL "http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.40/mysql-connector-java-5.1.40.jar" -o "${HIVE_HOME}/lib/mysql-connector-java-5.1.40.jar" \
+    && curl -fSL "http://central.maven.org/maven2/org/apache/derby/derbyclient/10.12.1.1/derbyclient-10.12.1.1.jar" -o "${HIVE_HOME}/lib/derbyclient-10.12.1.1.jar"
 
 # test hadoop
 RUN set -eux; $HADOOP_PREFIX/bin/hadoop version

@@ -34,6 +34,7 @@ services:
 #      - $HOME/hadoop_data/namenode2:/data/hadoop
 #    environment:
 #      - PS1_=secondarynamenode
+#      - WAIT_UNTIL_SERVER=hadoop-nn:8020
 #    env_file:
 #      - ./hadoop.env
 #    command: secondarynamenode
@@ -50,6 +51,7 @@ services:
       - $HOME/hadoop_data/datanode-1:/data/hadoop
     environment:
       - PS1_=datanode-1
+      - WAIT_UNTIL_SERVER=hadoop-nn:8020
     env_file:
       - ./hadoop.env
 #    healthcheck:
@@ -69,6 +71,7 @@ services:
       - $HOME/hadoop_data/datanode-1:/data/hadoop
     environment:
       - PS1_=nodemanager-1
+      - WAIT_UNTIL_SERVER=hadoop-nn:8020 hadoop-dn-1:50075 hadoop-rm:8088
     env_file:
       - ./hadoop.env
 #    healthcheck:
@@ -78,8 +81,8 @@ services:
   datanode-2:
     tty: true
     image: longe/hadoop:2.7.7
-    container_name: hadoop-dn-nm-2
-    hostname: hadoop-dn-nm-2
+    container_name: hadoop-dn-2
+    hostname: hadoop-dn-2
     expose: ["50010", "50020", "50075","8040", "8042"]
     depends_on:
       - namenode
@@ -87,6 +90,7 @@ services:
       - $HOME/hadoop_data/datanode-2:/data/hadoop
     environment:
       - PS1_=datanode-2
+      - WAIT_UNTIL_SERVER=hadoop-nn:8020
     env_file:
       - ./hadoop.env
 #    healthcheck:
@@ -108,6 +112,7 @@ services:
       - $HOME/hadoop_data/resourcemanager:/data/hadoop
     environment:
       - PS1_=resourcemanager
+      - WAIT_UNTIL_SERVER=hadoop-nn:8020 hadoop-dn-1:50075 hadoop-dn-2:50075
     env_file:
       - ./hadoop.env
 #    healthcheck:
@@ -130,6 +135,7 @@ services:
       - $HOME/hadoop_data/historyserver:/data/hadoop
     environment:
       - PS1_=historyserver
+      - WAIT_UNTIL_SERVER=hadoop-nn:8020 hadoop-rm:8088
     env_file:
       - ./hadoop.env
 #    healthcheck:
