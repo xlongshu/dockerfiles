@@ -2,9 +2,18 @@
 
 # hadoopd.sh
 
+HADOOP_VERSION=${HADOOP_VERSION:-"2.7.x"}
 HADOOP_HOME=${HADOOP_HOME:-"/opt/hadoop"}
 HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/etc/hadoop"}
 HADOOP_HDFS_INIT=${HADOOP_HDFS_INIT:-"hdfs dfs -ls /"}
+
+if [[ ${HADOOP_VERSION} =~ ^3 ]]; then
+  HDFS_DAEMON_CMD="hdfs --daemon"
+  YARN_DAEMON_CMD="yarn --daemon"
+else
+  HDFS_DAEMON_CMD="$HADOOP_HOME/sbin/hadoop-daemon.sh"
+  YARN_DAEMON_CMD="$HADOOP_HOME/sbin/yarn-daemon.sh"
+fi
 
 # hdfs namenode -format
 # hadoop-daemon.sh start <namenode|secondarynamenode|datanode|journalnode|dfs|dfsadmin|fsck|balancer|zkfc>
@@ -25,13 +34,13 @@ hadoop_daemon() {
       "$HADOOP_HOME/sbin/mr-jobhistory-daemon.sh" "$startStop" historyserver
     ;;
     resourcemanager | nodemanager | proxyserver | timelineserver)
-      "$HADOOP_HOME/sbin/yarn-daemon.sh" "$startStop" "$name"
+      ${YARN_DAEMON_CMD} "$startStop" "$name"
     ;;
     namenode | secondarynamenode | datanode | journalnode | dfs | dfsadmin | fsck | balancer | zkfc)
       if [[ "namenode" == "$name" ]]; then
         hadoop_format_namenode
       fi
-      "$HADOOP_HOME/sbin/hadoop-daemon.sh" "$startStop" "$name"
+      ${HDFS_DAEMON_CMD} "$startStop" "$name"
     ;;
   esac
 }

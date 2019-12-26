@@ -8,9 +8,9 @@
 ```bash
 ## Pseudo-Distributed
 docker run --rm -it \
--p 8020:8020 -p 50070:50070 -p 50090:50090 -p 8088:8088 -p 19888:19888 \
--v `pwd`/test/conf:/etc/hadoop \
--v `pwd`/test/data:/data/hadoop \
+-p 8020:8020 -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 8088:8088 -p 19888:19888 \
+-v `pwd`/temp/conf:/etc/hadoop \
+-v `pwd`/temp/data:/data/hadoop \
 -e PS1_=hadoop \
 --name hadoop-server -h hadoop-server \
 longe/hadoop:2.7.7 namenode,secondarynamenode,datanode,resourcemanager,nodemanager,historyserver

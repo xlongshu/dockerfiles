@@ -14,8 +14,11 @@ LABEL maintainer="xlongshu@163.com"
 VOLUME /data/hadoop
 
 # --build-arg HADOOP_VERSION=3.1.3 --build-arg MIRROR_APACHE=http://mirrors.aliyun.com/apache
-ARG HADOOP_VERSION="2.7.7"
+ARG HADOOP_VERSION
 ARG MIRROR_APACHE="http://archive.apache.org/dist"
+
+ENV HADOOP_VERSION=${HADOOP_VERSION:-"2.7.7"}
+ENV HADOOP_INSTALL="/opt/hadoop-$HADOOP_VERSION"
 
 RUN set -xe \
     && DEBIAN_FRONTEND=noninteractive \
@@ -24,21 +27,6 @@ RUN set -xe \
     openssh-client openssh-server telnet netcat tree \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /opt/
-
-#http://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-#http://www.apache.org/dyn/closer.cgi?action=download&filename=hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-ENV HADOOP_URL=$MIRROR_APACHE/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-RUN set -x \
-    && curl --silent --head $HADOOP_URL | head -n 1 \
-    && curl -fSL "$HADOOP_URL" -o hadoop-$HADOOP_VERSION.tar.gz \
-    && tar -zxf hadoop-$HADOOP_VERSION.tar.gz -C /opt/ \
-    && rm -f hadoop-$HADOOP_VERSION.tar.gz \
-    && rm -rf /opt/hadoop-$HADOOP_VERSION/share/doc
-
-# add local file
-#ADD "hadoop-$HADOOP_VERSION.tar.gz" /opt/
 
 # configure SSH
 RUN set -xe \
@@ -50,26 +38,60 @@ RUN set -xe \
     && chmod 600 $HOME/.ssh/authorized_keys
 ADD ssh_config /root/.ssh/config
 
+# add users
+RUN set -xe \
+    && useradd hadoop -r -m -s /bin/bash \
+    && usermod root -aG hadoop \
+    && for user in hdfs yarn mapred; do \
+         #useradd ${user} -s /usr/sbin/nologin -G hadoop; \
+         useradd ${user} -m -s /bin/bash -G hadoop; \
+       done \
+    && for user in hadoop hdfs yarn mapred; do \
+         cp -R /root/.ssh /home/${user}; \
+         chown ${user}:hadoop -R /home/${user}; \
+       done
+
+
+WORKDIR /opt/
+
+#http://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+#http://www.apache.org/dyn/closer.cgi?action=download&filename=hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+ENV HADOOP_URL=$MIRROR_APACHE/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+RUN set -x \
+    && curl --silent --head $HADOOP_URL | head -n 1 | grep "200 OK" \
+    && curl -fSL "$HADOOP_URL" -o hadoop-$HADOOP_VERSION.tar.gz \
+    && tar -zxf hadoop-$HADOOP_VERSION.tar.gz -C /opt/ \
+    && rm -f hadoop-$HADOOP_VERSION.tar.gz \
+    && rm -rf $HADOOP_INSTALL/share/doc \
+    && find $HADOOP_INSTALL -name "*.cmd" | xargs rm -rf \
+    && find $HADOOP_INSTALL/share/hadoop -path "*/sources" | xargs rm -rf \
+    && find $HADOOP_INSTALL/share/hadoop -name "*tests*.jar" | xargs rm -rf
+
+# add local file
+#ADD "hadoop-$HADOOP_VERSION.tar.gz" /opt/
+
+# test hadoop
+RUN set -eux; $HADOOP_INSTALL/bin/hadoop version
+
 ENV USER=root
-ENV HADOOP_PREFIX="/opt/hadoop-$HADOOP_VERSION" \
-    HADOOP_HOME="/opt/hadoop" \
+ENV HADOOP_HOME="/opt/hadoop" \
     HADOOP_CONF_DIR="/etc/hadoop" \
-    HADOOP_DATA_PREFIX="/data/hadoop"
+    HADOOP_DATA_DIR="/data/hadoop"
+# hadoop log dir
+ENV HADOOP_LOG_DIR=$HADOOP_DATA_DIR/logs \
+    YARN_LOG_DIR=$HADOOP_DATA_DIR/logs \
+    HADOOP_MAPRED_LOG_DIR=$HADOOP_DATA_DIR/logs
 
 ENV PATH $HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 ENV _PS1="docker-hadoop-$HADOOP_VERSION"
 
 RUN set -xe \
-    && ln -s $HADOOP_PREFIX $HADOOP_HOME \
-    && rm -rf $HADOOP_PREFIX/share/doc \
-    && mkdir -p $HADOOP_CONF_DIR $HADOOP_HOME/logs $HADOOP_DATA_PREFIX \
-    && mkdir -p ${HADOOP_DATA_PREFIX}/dfs/{data,name,namesecondary} ${HADOOP_DATA_PREFIX}/yarn/timeline
+    && ln -s $HADOOP_INSTALL $HADOOP_HOME \
+    && rm -rf $HADOOP_HOME/share/doc \
+    && mkdir -p ${HADOOP_CONF_DIR} ${HADOOP_DATA_DIR}
 
-RUN sed -i 's@${JAVA_HOME}@'/usr/lib/jvm/default-jvm'@g' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
-#RUN sed -i "/^export JAVA_HOME/ s:.*:export JAVA_HOME=${JAVA_HOME}:" ${HADOOP_CONF_DIR}/hadoop-env.sh
-
-# test hadoop
-RUN set -eux; $HADOOP_PREFIX/bin/hadoop version
+#RUN sed -i "s:.*export JAVA_HOME=.*:JAVA_HOME=${JAVA_HOME}:g" ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
+RUN sed -i "/export JAVA_HOME/a\export JAVA_HOME=${JAVA_HOME}" ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 
 COPY docker_hadoop.sh /docker_hadoop.sh
 RUN chmod +x /docker_hadoop.sh

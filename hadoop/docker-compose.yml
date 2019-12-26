@@ -68,7 +68,7 @@ services:
       - namenode
       - datanode-1
     volumes:
-      - $HOME/hadoop_data/datanode-1:/data/hadoop
+      - $HOME/hadoop_data/nodemanager-1:/data/hadoop
     environment:
       - PS1_=nodemanager-1
       - WAIT_UNTIL_SERVER=hadoop-nn:8020 hadoop-dn-1:50075 hadoop-rm:8088

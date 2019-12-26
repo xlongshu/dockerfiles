@@ -16,3 +16,4 @@
 *.swo
 *.log
 *.bak
+temp/

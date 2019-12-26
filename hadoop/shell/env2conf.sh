@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # env2conf.sh
 
 # env2conf <filePath> [envPrefix]
@@ -17,12 +18,12 @@ function env2conf() {
     # revert: - <== ___; _ <== __; . <== _;
     local key=$(echo "${keyname}" | sed -e "s/^${envPrefix}_//" -e 's/___/-/g; s/__/@/g; s/_/./g; s/@/_/g;')
     local val="${!keyname}" # get from env
+    #unset "${keyname}"
     if [[ "$fileExt" == "xml" ]]; then
       add2xml "${filePath}" "${key}" "${val}"
     else
       add2conf "${filePath}" "${key}" "${val}"
     fi
-  #unset "${keyname}"
   done
 }
 
@@ -38,13 +39,15 @@ function add2xml() {
     echo '</configuration>' >> ${filePath}
   fi
 
-  if [[ -n $(cat ${filePath} | grep ${name}) ]]; then
+  if grep "${name}" ${filePath}; then
     return 0
   fi
 
   local property="<property><name>$name</name><value>$value</value></property>"
-  #sed -i "/<\/configuration>/ s/.*/${property}\n&/" ${filePath}
   sed -i "s#</configuration>#${property}\n&#" ${filePath}
+  #local escapedEntry=$(echo ${property} | sed 's/\//\\\//g')
+  #sed -i "/<\/configuration>/ s/.*/${escapedEntry}\n&/" ${filePath}
+  #sed -i "/<\/configuration/i\${escapedEntry}" ${filePath}
 }
 
 function add2conf() {
