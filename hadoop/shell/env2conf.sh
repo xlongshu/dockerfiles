@@ -39,7 +39,7 @@ function add2xml() {
     echo '</configuration>' >> ${filePath}
   fi
 
-  if grep "${name}" ${filePath}; then
+  if grep -q "${name}" ${filePath}; then
     return 0
   fi
 

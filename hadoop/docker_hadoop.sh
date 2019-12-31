@@ -9,32 +9,34 @@ else
   cat /etc/issue
 fi
 
+export HADOOP_VERSION=${HADOOP_VERSION:-"2.7.x"}
 export HADOOP_HOME=${HADOOP_HOME:-"/opt/hadoop"}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/etc/hadoop"}
 export HADOOP_DATA_DIR=${HADOOP_DATA_DIR:-"/data/hadoop"}
-
-set -e
-set -o pipefail
 
 echo "Init HADOOP_CONF_DIR=${HADOOP_CONF_DIR}"
 mkdir -p "${HADOOP_CONF_DIR}"
 cp -Ru ${HADOOP_HOME}/etc/hadoop/* ${HADOOP_CONF_DIR}/
 echo "Init HADOOP_DATA_DIR=${HADOOP_DATA_DIR}"
 mkdir -p ${HADOOP_DATA_DIR}/logs ${HADOOP_DATA_DIR}/dfs ${HADOOP_DATA_DIR}/yarn ${HADOOP_DATA_DIR}/mapred
-mkdir ${HADOOP_HOME}/logs
-chgrp -R hadoop ${HADOOP_DATA_DIR} ${HADOOP_HOME}/logs
-chmod g+rw -R ${HADOOP_DATA_DIR} ${HADOOP_HOME}/logs
+ln -sf ${HADOOP_DATA_DIR}/logs ${HADOOP_HOME}/logs
+chgrp -R hadoop ${HADOOP_DATA_DIR}
+chmod g+rw -R ${HADOOP_DATA_DIR}
+
+set -e
+set -o pipefail
 
 ## Set some sensible defaults
 # core-site.xml
-export CORE_SITE_fs_defaultFS=${CORE_SITE_fs_defaultFS:-"hdfs://$(hostname -f):8020/"}
+export CORE_SITE_fs_defaultFS=${CORE_SITE_fs_defaultFS:-"hdfs://$(hostname -f):8020"}
 export CORE_SITE_hadoop_tmp_dir=${CORE_SITE_hadoop_tmp_dir:-"/data/hadoop"}
 export CORE_SITE_hadoop_proxyuser_root_hosts=${CORE_SITE_hadoop_proxyuser_root_hosts:-"*"}
 export CORE_SITE_hadoop_proxyuser_root_groups=${CORE_SITE_hadoop_proxyuser_root_groups:-"*"}
 # hdfs-site.xml
-#export HDFS_SITE_dfs_replication=${HDFS_SITE_dfs_replication:-"1"}
+export HDFS_SITE_dfs_replication=${HDFS_SITE_dfs_replication:-"1"}
 export HDFS_SITE_dfs_webhdfs_enabled=${HDFS_SITE_dfs_webhdfs_enabled:-"true"}
-export HDFS_SITE_dfs_permissions_enabled=${HDFS_SITE_dfs_permissions_enabled:-"false"}
+export HDFS_SITE_dfs_permissions_enabled=${HDFS_SITE_dfs_permissions_enabled:-"true"}
+export HDFS_SITE_dfs_permissions_superusergroup=${HDFS_SITE_dfs_permissions_superusergroup:-"hadoop"}
 export HDFS_SITE_dfs_namenode_rpc___bind___host=${HDFS_SITE_dfs_namenode_rpc___bind___host:-"0.0.0.0"}
 export HDFS_SITE_dfs_namenode_servicerpc___bind___host=${HDFS_SITE_dfs_namenode_servicerpc___bind___host:-"0.0.0.0"}
 export HDFS_SITE_dfs_namenode_http___bind___host=${HDFS_SITE_dfs_namenode_http___bind___host:-"0.0.0.0"}
@@ -64,19 +66,27 @@ for conf in "${hadoop_confs[@]}"; do
   /opt/env2conf.sh ${conf}
 done
 
-
-source /opt/hadoopd.sh "--"
-source /opt/wait_until.sh
-
-echo "Waiting services:[${WAIT_UNTIL_SERVER}] ..."
-for ws in ${WAIT_UNTIL_SERVER[@]}; do
-  wait_until_server ${ws}
-done
-
-# 3.x HADOOP_SLAVE_NAMES has been replaced by HADOOP_WORKER_NAMES
-if [[ -n ${HADOOP_SLAVE_NAMES} && -e ${HADOOP_HOME}/sbin/workers.sh ]]; then
-  export HADOOP_WORKER_NAMES=${HADOOP_SLAVE_NAMES}
-  unset HADOOP_SLAVE_NAMES
+if [[ ${HADOOP_VERSION} =~ ^3 ]]; then
+  export HDFS_NAMENODE_USER=${HDFS_NAMENODE_USER:-"root"}
+  export HDFS_DATANODE_USER=${HDFS_DATANODE_USER:-"root"}
+  export HDFS_SECONDARYNAMENODE_USER=${HDFS_SECONDARYNAMENODE_USER:-"root"}
+  #export HDFS_DATANODE_SECURE_USER=${HDFS_DATANODE_SECURE_USER:-"hdfs"}
+  export YARN_RESOURCEMANAGER_USER=${YARN_RESOURCEMANAGER_USER:-"root"}
+  export YARN_NODEMANAGER_USER=${YARN_NODEMANAGER_USER:-"root"}
+  # hadoop log dir
+  export HADOOP_LOG_DIR=${HADOOP_LOG_DIR:-${HADOOP_DATA_DIR}/logs}
+  unset YARN_LOG_DIR
+  unset HADOOP_MAPRED_LOG_DIR
+  # 3.x HADOOP_SLAVE_NAMES has been replaced by HADOOP_WORKER_NAMES
+  if [[ -n ${HADOOP_SLAVE_NAMES} ]]; then
+    export HADOOP_WORKER_NAMES=${HADOOP_SLAVE_NAMES}
+    unset HADOOP_SLAVE_NAMES
+  fi
+else
+  # hadoop log dir
+  export HADOOP_LOG_DIR=${HADOOP_LOG_DIR:-${HADOOP_DATA_DIR}/logs}
+  export YARN_LOG_DIR=${YARN_LOG_DIR:-${HADOOP_DATA_DIR}/logs}
+  export HADOOP_MAPRED_LOG_DIR=${HADOOP_MAPRED_LOG_DIR:-${HADOOP_DATA_DIR}/logs}
 fi
 
 env | grep -E '^(JAVA|HADOOP_|HDFS_|YARN_)'  \
@@ -84,6 +94,25 @@ env | grep -E '^(JAVA|HADOOP_|HDFS_|YARN_)'  \
  | sed 's/^/export /g'  \
  > /etc/profile.d/export_hadoop.sh
 echo "PATH=$PATH:\$PATH" >> /etc/profile.d/export_hadoop.sh
+
+
+if [[ -d /docker-entrypoint.d ]]; then
+  for f in $(find /docker-entrypoint.d -type f -name "*.sh"); do
+    echo "running $f";
+    . "$f"
+  done
+  unset f
+fi
+
+
+source /opt/hadoopd.sh "--"
+source /opt/wait_until.sh
+
+echo "Waiting services:[${WAIT_UNTIL_SERVER}] ..."
+for ws in ${WAIT_UNTIL_SERVER[@]}; do
+  wait_until_server ${ws}
+  sleep 1
+done
 
 set -e
 export RUN_SERVICE="$1"

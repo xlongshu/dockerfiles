@@ -22,7 +22,7 @@ ENV HADOOP_INSTALL="/opt/hadoop-$HADOOP_VERSION"
 
 RUN set -xe \
     && apk update && apk upgrade \
-    && apk add openssh busybox-extras tree \
+    && apk add openssh busybox-extras tree snappy openssl \
     && rm -rf /var/cache/apk/*
 
 # configure SSH
@@ -75,11 +75,8 @@ RUN set -eux; $HADOOP_INSTALL/bin/hadoop version
 ENV USER=root
 ENV HADOOP_HOME="/opt/hadoop" \
     HADOOP_CONF_DIR="/etc/hadoop" \
-    HADOOP_DATA_DIR="/data/hadoop"
-# hadoop log dir
-ENV HADOOP_LOG_DIR=$HADOOP_DATA_DIR/logs \
-    YARN_LOG_DIR=$HADOOP_DATA_DIR/logs \
-    HADOOP_MAPRED_LOG_DIR=$HADOOP_DATA_DIR/logs
+    HADOOP_DATA_DIR="/data/hadoop" \
+    HADOOP_LOG_DIR="/data/hadoop/logs"
 
 ENV PATH $HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 ENV _PS1="docker-hadoop-$HADOOP_VERSION"
@@ -87,6 +84,7 @@ ENV _PS1="docker-hadoop-$HADOOP_VERSION"
 RUN set -xe \
     && ln -s $HADOOP_INSTALL $HADOOP_HOME \
     && rm -rf $HADOOP_HOME/share/doc \
+    && mkdir /docker-entrypoint.d \
     && mkdir -p ${HADOOP_CONF_DIR} ${HADOOP_DATA_DIR}
 
 #RUN sed -i "s:.*export JAVA_HOME=.*:JAVA_HOME=${JAVA_HOME}:g" ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh

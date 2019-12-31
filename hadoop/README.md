@@ -7,13 +7,21 @@
 
 ```bash
 ## Pseudo-Distributed
+#hadoop2.x
 docker run --rm -it \
--p 8020:8020 -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 8088:8088 -p 19888:19888 \
+-p 8020:8020 -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 8088:8088 -p 8042:8042 -p 19888:19888 -p 8188:8188 \
 -v `pwd`/temp/conf:/etc/hadoop \
 -v `pwd`/temp/data:/data/hadoop \
--e PS1_=hadoop \
+-e PS1_=hadoop2 \
 --name hadoop-server -h hadoop-server \
-longe/hadoop:2.7.7 namenode,secondarynamenode,datanode,resourcemanager,nodemanager,historyserver
+longe/hadoop:2.7.7 namenode,secondarynamenode,datanode,resourcemanager,nodemanager,historyserver,timelineserver
+
+#hadoop3.x
+docker run --rm -it \
+-p 8020:8020 -p 50070:9870 -p 50075:9864 -p 50090:9868 -p 8088:8088 -p 8042:8042 -p 19888:19888 -p 8188:8188 \
+-e PS1_=hadoop3 \
+--name hadoop-server -h hadoop-server \
+longe/hadoop:3.1.3 namenode,secondarynamenode,datanode,resourcemanager,nodemanager,historyserver,timelineserver
 
 ```
 

@@ -29,7 +29,7 @@ wait_until() {
   local port=${2?}
   local quit=${3:-0}
   local max_try=${4:-45}
-  local retry_sec=${5:-3}
+  local retry_sec=${5:-4}
 
   local count=1
   local result=$(check_port ${hostname} ${port})
@@ -49,6 +49,7 @@ wait_until() {
   done
 
   echo "[$count/$max_try] ${hostname}:${port} is available."
+  sleep 1
 }
 
 
@@ -58,7 +59,7 @@ wait_until_server() {
   local port=${serviceport#*:}
   local quit=${2:-1}
   local max_try=${3:-45}
-  local retry_sec=${4:-3}
+  local retry_sec=${4:-4}
 
   wait_until ${service} ${port} ${quit} ${max_try} ${retry_sec}
 }

@@ -24,7 +24,7 @@ RUN set -xe \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-    openssh-client openssh-server telnet netcat tree \
+    openssh-client openssh-server telnet netcat tree libsnappy1v5 openssl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -40,7 +40,7 @@ ADD ssh_config /root/.ssh/config
 
 # add users
 RUN set -xe \
-    && useradd hadoop -r -m -s /bin/bash \
+    && useradd hadoop -m -s /bin/bash \
     && usermod root -aG hadoop \
     && for user in hdfs yarn mapred; do \
          #useradd ${user} -s /usr/sbin/nologin -G hadoop; \
@@ -71,16 +71,13 @@ RUN set -x \
 #ADD "hadoop-$HADOOP_VERSION.tar.gz" /opt/
 
 # test hadoop
-RUN set -eux; $HADOOP_INSTALL/bin/hadoop version
+RUN set -eux; $HADOOP_INSTALL/bin/hadoop version; $HADOOP_INSTALL/bin/hadoop checknative
 
 ENV USER=root
 ENV HADOOP_HOME="/opt/hadoop" \
     HADOOP_CONF_DIR="/etc/hadoop" \
-    HADOOP_DATA_DIR="/data/hadoop"
-# hadoop log dir
-ENV HADOOP_LOG_DIR=$HADOOP_DATA_DIR/logs \
-    YARN_LOG_DIR=$HADOOP_DATA_DIR/logs \
-    HADOOP_MAPRED_LOG_DIR=$HADOOP_DATA_DIR/logs
+    HADOOP_DATA_DIR="/data/hadoop" \
+    HADOOP_LOG_DIR="/data/hadoop/logs"
 
 ENV PATH $HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 ENV _PS1="docker-hadoop-$HADOOP_VERSION"
@@ -88,6 +85,7 @@ ENV _PS1="docker-hadoop-$HADOOP_VERSION"
 RUN set -xe \
     && ln -s $HADOOP_INSTALL $HADOOP_HOME \
     && rm -rf $HADOOP_HOME/share/doc \
+    && mkdir /docker-entrypoint.d \
     && mkdir -p ${HADOOP_CONF_DIR} ${HADOOP_DATA_DIR}
 
 #RUN sed -i "s:.*export JAVA_HOME=.*:JAVA_HOME=${JAVA_HOME}:g" ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
