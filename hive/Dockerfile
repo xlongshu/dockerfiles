@@ -11,7 +11,8 @@ VOLUME /data/hive
 ARG HIVE_VERSION
 ARG MIRROR_APACHE="http://archive.apache.org/dist"
 
-ENV HIVE_VERSION=${HIVE_VERSION:-"2.3.4"} HIVE_INSTALL="/opt/apache-hive-$HIVE_VERSION-bin"
+ENV HIVE_VERSION=${HIVE_VERSION:-"2.3.4"}
+ENV HIVE_INSTALL="/opt/apache-hive-$HIVE_VERSION-bin"
 
 WORKDIR /opt/
 
