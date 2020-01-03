@@ -96,15 +96,6 @@ env | grep -E '^(JAVA|HADOOP_|HDFS_|YARN_)'  \
 echo "PATH=$PATH:\$PATH" >> /etc/profile.d/export_hadoop.sh
 
 
-if [[ -d /docker-entrypoint.d ]]; then
-  for f in $(find /docker-entrypoint.d -type f -name "*.sh"); do
-    echo "running $f";
-    . "$f"
-  done
-  unset f
-fi
-
-
 source /opt/hadoopd.sh "--"
 source /opt/wait_until.sh
 
@@ -113,6 +104,16 @@ for ws in ${WAIT_UNTIL_SERVER[@]}; do
   wait_until_server ${ws}
   sleep 1
 done
+
+# run /docker-entrypoint.d/*.sh
+if [[ -d /docker-entrypoint.d ]]; then
+  for f in $(find /docker-entrypoint.d -type f -name "*.sh"); do
+    echo "running $f";
+    . "$f"
+  done
+  unset f
+fi
+
 
 set -e
 export RUN_SERVICE="$1"

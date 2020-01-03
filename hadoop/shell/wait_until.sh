@@ -36,10 +36,10 @@ wait_until() {
 
   until [[ ${result} -eq 0 ]]; do
     echo "[$count/$max_try] Waiting until ${hostname} ${port} up ..."
-    if [[ ${max_try} == ${count} ]]; then
+    if [[ ${max_try} -eq ${count} ]]; then
       echo "Giving up after ${max_try} tries, ${hostname} ${port} is still not available!"
       [[ 1 -eq ${quit} ]] && exit 1
-      return 2
+      break
     fi
 
     echo "[$count/$max_try] try in ${retry_sec}s once again ..."
@@ -48,7 +48,7 @@ wait_until() {
     result=$(check_port ${hostname} ${port})
   done
 
-  echo "[$count/$max_try] ${hostname}:${port} is available."
+  [[ ${result} -eq 0 ]] && echo "[$count/$max_try] ${hostname}:${port} is available."
   sleep 1
 }
 

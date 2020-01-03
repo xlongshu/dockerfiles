@@ -6,8 +6,8 @@
 # test
 docker run --rm -it \
 -p 10000:10000 -p 10002:10002 \
--v `pwd`/test:/etc/hive \
--v `pwd`/test:/data/hive \
+-v `pwd`/temp:/etc/hive \
+-v `pwd`/temp:/data/hive \
 --network hadoop \
 --env-file `pwd`/hive-test.env \
 --name hive-test -h hive-test \
