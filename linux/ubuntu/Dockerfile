@@ -4,7 +4,8 @@ FROM ubuntu:${FROM_TAG}
 LABEL maintainer="xlongshu@163.com"
 
 # --build-arg MIRROR_UBUNTU=mirrors.ustc.edu.cn
-ARG MIRROR_UBUNTU=""
+ARG MIRROR_UBUNTU
+ENV MIRROR_UBUNTU=$MIRROR_UBUNTU
 
 RUN set -xe; \
     if [ ${MIRROR_UBUNTU} ]; then \
@@ -13,8 +14,9 @@ RUN set -xe; \
     fi \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
+    && if ! command -v gpg > /dev/null; then apt-get install -y --no-install-recommends gnupg dirmngr; fi \
     && apt-get install -y --no-install-recommends \
-    locales tzdata file tree psmisc iputils-ping net-tools ca-certificates curl netbase telnet \
+    locales tzdata file tree procps psmisc iputils-ping net-tools ca-certificates curl netbase telnet \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

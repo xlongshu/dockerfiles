@@ -4,7 +4,8 @@ FROM debian:${FROM_TAG}
 LABEL maintainer="xlongshu@163.com"
 
 # --build-arg MIRROR_DEBIAN=mirrors.aliyun.com
-ARG MIRROR_DEBIAN=""
+ARG MIRROR_DEBIAN
+ENV MIRROR_DEBIAN=$MIRROR_DEBIAN
 
 RUN set -xe; \
     if [ ${MIRROR_DEBIAN} ]; then \
@@ -13,8 +14,9 @@ RUN set -xe; \
     fi \
     && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
+    && if ! command -v gpg > /dev/null; then apt-get install -y --no-install-recommends gnupg dirmngr; fi \
     && apt-get install -y --no-install-recommends \
-    locales tzdata file tree psmisc iputils-ping net-tools ca-certificates curl netbase telnet \
+    locales tzdata file tree procps psmisc iputils-ping net-tools ca-certificates curl netbase telnet \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

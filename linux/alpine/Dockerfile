@@ -4,7 +4,8 @@ FROM alpine:${FROM_TAG}
 LABEL maintainer="xlongshu@163.com"
 
 # --build-arg MIRROR_ALPINE=mirrors.aliyun.com
-ARG MIRROR_ALPINE=""
+ARG MIRROR_ALPINE
+ENV MIRROR_ALPINE=$MIRROR_ALPINE
 
 RUN set -xe \
     && if [[ ${MIRROR_ALPINE} ]]; then sed -i "s@dl-cdn.alpinelinux.org@${MIRROR_ALPINE}@g" /etc/apk/repositories; fi \
