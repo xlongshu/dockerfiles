@@ -10,7 +10,7 @@ docker tag longe/java:8 longe/java:8-bionic
 
 # 18.04 bionic, java:11
 docker build -t longe/java:11 ./ --build-arg JAVA_VER=11
-docker tag longe/java:8 longe/java:11-bionic
+docker tag longe/java:11 longe/java:11-bionic
 
 # 16.04 xenial, java:8
 docker build -t longe/java:8-xenial . --build-arg FROM_TAG=16.04
