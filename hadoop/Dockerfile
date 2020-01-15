@@ -15,10 +15,10 @@ VOLUME /data/hadoop
 
 # --build-arg HADOOP_VERSION=3.1.3 --build-arg MIRROR_APACHE=http://mirrors.aliyun.com/apache
 ARG HADOOP_VERSION
-ARG MIRROR_APACHE="http://archive.apache.org/dist"
+ARG MIRROR_APACHE
 
 ENV HADOOP_VERSION=${HADOOP_VERSION:-"2.7.7"}
-ENV HADOOP_INSTALL="/opt/hadoop-$HADOOP_VERSION"
+ENV MIRROR_APACHE=${MIRROR_APACHE:-"http://archive.apache.org/dist"}
 
 RUN set -xe \
     && DEBIAN_FRONTEND=noninteractive \
@@ -53,11 +53,12 @@ RUN set -xe \
 
 
 WORKDIR /opt/
+ENV HADOOP_INSTALL="/opt/hadoop-$HADOOP_VERSION"
 
 #http://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 #http://www.apache.org/dyn/closer.cgi?action=download&filename=hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-ENV HADOOP_URL=$MIRROR_APACHE/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 RUN set -x \
+    && HADOOP_URL=$MIRROR_APACHE/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz \
     && curl --silent --head $HADOOP_URL | head -n 1 | grep "200 OK" \
     && curl -fSL "$HADOOP_URL" -o hadoop-$HADOOP_VERSION.tar.gz \
     && tar -zxf hadoop-$HADOOP_VERSION.tar.gz -C /opt/ \

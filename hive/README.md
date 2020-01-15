@@ -2,6 +2,7 @@
 ## hive
 
 ### Quick Start
+
 ```bash
 # test
 docker run --rm -it \
@@ -22,7 +23,10 @@ docker-compose up -d
 
 
 ## build
+
+
 - ubuntu
+
 ```bash
 ## 18.04 bionic, java-8
 # hadoop-2.7.7, hive:1.2.2
@@ -45,7 +49,9 @@ docker build -t longe/hive:2.3.4-hadoop-2.7.7-xenial ./ --build-arg FROM_TAG=2.7
 
 ```
 
+
 - debian
+
 ```bash
 ## 9 stretch, java-8
 # hadoop-2.7.7, hive:1.2.2
@@ -62,7 +68,9 @@ docker build -t longe/hive:2.3.4-hadoop-2.7.7-openjdk-8 ./ --build-arg FROM_TAG=
 
 ```
 
+
 - Hive Docs
+
 ```text
 https://cwiki.apache.org/confluence/display/Hive/GettingStarted
 https://cwiki.apache.org/confluence/display/Hive/Hive+Schema+Tool

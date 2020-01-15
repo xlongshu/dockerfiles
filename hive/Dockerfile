@@ -9,9 +9,10 @@ VOLUME /data/hive
 
 # --build-arg HIVE_VERSION=3.1.1 --build-arg MIRROR_APACHE=http://mirrors.aliyun.com/apache
 ARG HIVE_VERSION
-ARG MIRROR_APACHE="http://archive.apache.org/dist"
+ARG MIRROR_APACHE
 
 ENV HIVE_VERSION=${HIVE_VERSION:-"2.3.4"}
+ENV MIRROR_APACHE=${MIRROR_APACHE:-"http://archive.apache.org/dist"}
 ENV HIVE_INSTALL="/opt/apache-hive-$HIVE_VERSION-bin"
 
 WORKDIR /opt/
