@@ -102,14 +102,18 @@ fi
 WAREHOUSE_DIR=${HIVE_SITE_hive_metastore_warehouse_dir}
 TMP_DIR=${HIVE_SITE_hive_exec_scratchdir}
 #init-hive-dfs.sh --warehouse-dir ${WAREHOUSE_DIR} --tmp-dir ${TMP_DIR}
-#hadoop fs -mkdir -p   ${WAREHOUSE_DIR} ${TMP_DIR}
-#hadoop fs -chmod g+w  ${WAREHOUSE_DIR} ${TMP_DIR}
-echo "Creating directory warehouse-dir=[${WAREHOUSE_DIR}], tmp-dir=[${TMP_DIR}] ..."
-hadoop fs -test -d ${WAREHOUSE_DIR} || hadoop fs -mkdir -p ${WAREHOUSE_DIR}
-hadoop fs -test -e ${WAREHOUSE_DIR} && hadoop fs -chmod g+w ${WAREHOUSE_DIR}
-hadoop fs -test -d ${TMP_DIR} || hadoop fs -mkdir -p ${TMP_DIR}
-hadoop fs -test -e ${TMP_DIR} && hadoop fs -chmod +w ${TMP_DIR}
 
+function init_hive_dfs() {
+  local WAREHOUSE_DIR=${1:-"/user/hive/warehouse"}
+  local TMP_DIR=${2:-"/tmp/hive"}
+  echo "Creating directory warehouse-dir=[${WAREHOUSE_DIR}], tmp-dir=[${TMP_DIR}] ..."
+  #hadoop fs -mkdir -p   ${WAREHOUSE_DIR} ${TMP_DIR}
+  #hadoop fs -chmod g+w  ${WAREHOUSE_DIR} ${TMP_DIR}
+  hadoop fs -test -d ${WAREHOUSE_DIR} || hadoop fs -mkdir -p ${WAREHOUSE_DIR}
+  hadoop fs -test -e ${WAREHOUSE_DIR} && hadoop fs -chmod g+w ${WAREHOUSE_DIR}
+  hadoop fs -test -d ${TMP_DIR} || hadoop fs -mkdir -p ${TMP_DIR}
+  hadoop fs -test -e ${TMP_DIR} && hadoop fs -chmod +w ${TMP_DIR}
+}
 
 function test_metastore_db() {
   local dbType=${1:-"derby"}
@@ -118,6 +122,7 @@ function test_metastore_db() {
 }
 
 function init_metastore() {
+  init_hive_dfs ${WAREHOUSE_DIR} ${TMP_DIR} &
   if [[ 0 -ne $(test_metastore_db "${HIVE_DBTYPE}") ]]; then
     echo "initSchema: ${HIVE_DBTYPE} ..."
     "$HIVE_HOME/bin/schematool" -dbType "${HIVE_DBTYPE}" -initSchema
@@ -128,13 +133,16 @@ function hive_daemon() {
   local service=$1
   touch "${service}.log"
   nohup "$HIVE_HOME/bin/hive" --service ${service} 1>>"${service}.log" 2>&1 &
-  #nohup "$HIVE_HOME/bin/hive" --service ${service} 1 >>"${service}.log" 2 >>"${service}.err" &
+  #nohup "$HIVE_HOME/bin/hive" --service ${service} 1>>"${service}.log" 2>>"${service}.err" &
   echo $! >"${service}.pid"
   sleep 1
 }
 
+# workdir
 mkdir -p /data/hive && cd /data/hive
-mkdir -p "/tmp/$(id -un)" && touch "/tmp/$(id -un)/hive.log"
+
+TMP_USER_DIR="/tmp/$(id -un)"
+mkdir -p "${TMP_USER_DIR}" && touch "${TMP_USER_DIR}/hive.log"
 
 echo "Exec: [$*]"
 case ${1} in
@@ -148,17 +156,17 @@ case ${1} in
       shift 1
       exec "$@"
     else
-      tail -n 600 -f metastore.log hiveserver2.log "/tmp/$(id -un)/hive.log"
+      tail -n 600 -f metastore.log hiveserver2.log "${TMP_USER_DIR}/hive.log"
     fi
   ;;
   hiveserver2)
     hive_daemon hiveserver2
-    tail -n 400 -f hiveserver2.log "/tmp/$(id -un)/hive.log"
+    tail -n 400 -f hiveserver2.log "${TMP_USER_DIR}/hive.log"
   ;;
   metastore)
     init_metastore
     hive_daemon metastore
-    tail -n 400 -f metastore.log "/tmp/$(id -un)/hive.log"
+    tail -n 400 -f metastore.log "${TMP_USER_DIR}/hive.log"
   ;;
   beeline | cli | metatool | schemaTool)
     "$HIVE_HOME/bin/hive" --service "$@"

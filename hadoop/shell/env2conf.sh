@@ -28,9 +28,9 @@ function env2conf() {
 }
 
 function add2xml() {
-  local filePath=$1
-  local name=$2
-  local value=$3
+  local filePath="$1"
+  local name="$2"
+  local value="$3"
 
   if [[ ! -f ${filePath} ]]; then
     # hadoop configuration file
@@ -44,16 +44,15 @@ function add2xml() {
   fi
 
   local property="<property><name>$name</name><value>$value</value></property>"
-  sed -i "s#</configuration>#${property}\n&#" ${filePath}
+  #sed -i "s#</configuration>#${property}\n&#" ${filePath}
   #local escapedEntry=$(echo ${property} | sed 's/\//\\\//g')
-  #sed -i "/<\/configuration>/ s/.*/${escapedEntry}\n&/" ${filePath}
-  #sed -i "/<\/configuration/i\${escapedEntry}" ${filePath}
+  sed -i "/<\/configuration/i\  ${property}" ${filePath}
 }
 
 function add2conf() {
-  local filePath=$1
-  local name=$2
-  local value=$3
+  local filePath="$1"
+  local name="$2"
+  local value="$3"
 
   echo "$name=$value" >> ${filePath}
 }

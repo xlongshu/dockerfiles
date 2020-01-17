@@ -18,7 +18,7 @@ services:
       - $HOME/hive_data/hiveserver2:/data/hive
     environment:
       - PS1_=hiveserver2
-      - WAIT_UNTIL_SERVER=hive-metastore:9083
+      - WAIT_UNTIL_SERVER=metastore:9083
     env_file:
       - ./hive.env
     command: hiveserver2
@@ -28,20 +28,22 @@ services:
     container_name: hive-metastore
     hostname: hive-metastore
     ports:  ["9083:9083"]
-    depends_on:
-      - metastore_db_postgres
     volumes:
       - $HOME/hive_data/metastore:/data/hive
     environment:
       - PS1_=metastore
+      - HIVE_DBTYPE=postgres
+      - WAIT_UNTIL_SERVER=db_postgres:5432
+      #- WAIT_UNTIL_SERVER=db_mysql:3306
+      #- WAIT_UNTIL_SERVER=db_derby:1527
     env_file:
       - ./hive.env
     command: metastore
 
-  metastore_db_postgres:
+ db_postgres:
     image: postgres:9-alpine
-    container_name: hive-metastore_db_postgres
-    ports:  ["5432:54320"]
+    container_name: hive-db_postgres
+    ports:  ["54320:5432"]
     volumes:
       - $HOME/hive_data/hive_postgres:/var/lib/postgresql/data
     environment:
@@ -49,20 +51,20 @@ services:
       - POSTGRES_USER=hive
       - POSTGRES_PASSWORD=hive123456
 
-#  metastore_db_mysql:
-#    image: mysql:5.6
-#    container_name: hive-metastore_db_mysql
-#    ports: ["3306:33060"]
+#  db_mysql:
+#    image: mysql:5.6.45
+#    container_name: hive-db_mysql
+#    ports: ["33060:3306"]
 #    volumes:
 #      - $HOME/hive_data/hive_mysql:/var/lib/mysql
 #    environment:
 #      - MYSQL_DATABASE=metastore_db
-#      - MYSQL_USER=hive
-#      - MYSQL_PASSWORD=hive123456
-#
-#  metastore_db_derby:
+#      - MYSQL_ROOT_PASSWORD=root123456
+#    command: --character-set-server=utf8 --collation-server=utf8_unicode_ci
+
+#  db_derby:
 #    image: az82/docker-derby:v1.3
-#    container_name: hive-metastore_db_derby
-#    ports: ["1527:15270"]
+#    container_name: hive-db_derby
+#    ports: ["1527:1527"]
 #    volumes:
 #      - $HOME/hive_data/hive_derby:/dbs

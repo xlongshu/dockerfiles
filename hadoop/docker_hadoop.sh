@@ -18,10 +18,12 @@ echo "Init HADOOP_CONF_DIR=${HADOOP_CONF_DIR}"
 mkdir -p "${HADOOP_CONF_DIR}"
 cp -Ru ${HADOOP_HOME}/etc/hadoop/* ${HADOOP_CONF_DIR}/
 echo "Init HADOOP_DATA_DIR=${HADOOP_DATA_DIR}"
-mkdir -p ${HADOOP_DATA_DIR}/logs ${HADOOP_DATA_DIR}/dfs ${HADOOP_DATA_DIR}/yarn ${HADOOP_DATA_DIR}/mapred
-ln -sf ${HADOOP_DATA_DIR}/logs ${HADOOP_HOME}/logs
-chgrp -R hadoop ${HADOOP_DATA_DIR}
-chmod g+rw -R ${HADOOP_DATA_DIR}
+if [[ ! -e "${HADOOP_HOME}/logs" ]]; then
+  mkdir -p ${HADOOP_DATA_DIR}/logs ${HADOOP_DATA_DIR}/dfs ${HADOOP_DATA_DIR}/yarn ${HADOOP_DATA_DIR}/mapred
+  ln -sf ${HADOOP_DATA_DIR}/logs ${HADOOP_HOME}/logs
+  chgrp -R hadoop ${HADOOP_DATA_DIR}
+  chmod g+rw -R ${HADOOP_DATA_DIR}
+fi
 
 set -e
 set -o pipefail
