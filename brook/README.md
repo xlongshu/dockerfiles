@@ -7,7 +7,7 @@
 
 ```bash
 docker run -it -d \
--p 6060:6060 -p 6080:6080 \
+-p 6080:6080 \
 --name brook -h brook \
 --restart=always \
 longe/brook 
@@ -44,4 +44,41 @@ docker build -t longe/brook:v20200201-stretch ./ --build-arg FROM_IMG=debian --b
 # 10 buster
 docker build -t longe/brook:v20200201-buster ./ --build-arg FROM_IMG=debian --build-arg FROM_TAG=10 --build-arg BROOK_VERSION=v20200201
 
+```
+
+
+```nginx
+http {
+    # ...
+
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ''      close;
+    }
+
+    server {
+        listen  80;
+        server_name  ws.domain.com;
+
+        index  index.html index.htm;
+
+        proxy_set_header  Cookie $http_cookie;
+        proxy_set_header  X-Real-IP $remote_addr;
+        #proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-For $remote_addr;
+
+        location / {
+            proxy_pass  https://docs.gitbook.com/;
+            expires  12h;
+        }
+
+        location /ws {
+            proxy_pass http://127.0.0.1:6080;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+        }
+    }
+
+}
 ```

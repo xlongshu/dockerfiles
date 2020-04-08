@@ -21,7 +21,7 @@ ENV _PS1="docker-brook"
 
 ENV ARGS="wsserver -l :6080 -p brook123456"
 
-EXPOSE 6060
-#EXPOSE 6080
+#EXPOSE 6060
+EXPOSE 6080
 
 CMD brook ${ARGS}
