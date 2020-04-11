@@ -21,8 +21,8 @@ longe/brook
 
 ```bash
 # 3.10
-docker build -t longe/brook:v20200201 ./
-docker tag longe/brook:v20200201 longe/brook:latest
+docker build -t longe/brook:latest ./
+docker tag longe/brook:latest longe/brook:v20200201
 
 # 3.9
 docker build -t longe/brook:v20200201-alpine-3.9 ./ --build-arg FROM_TAG=3.9 --build-arg BROOK_VERSION=v20200201

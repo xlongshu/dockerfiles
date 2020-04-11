@@ -4,14 +4,13 @@ FROM longe/${FROM_IMG}:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"
 
-# --build-arg BROOK_VERSION=
+# --build-arg BROOK_VERSION=v20200201
 ARG BROOK_VERSION
+ENV BROOK_VERSION=${BROOK_VERSION}
 
-ENV BROOK_VERSION=${BROOK_VERSION:-"v20200201"}
-
-# https://github.com/txthinking/brook/releases/latest/download/brook
 RUN set -xe \
-    && BROOK_URL="https://github.com/txthinking/brook/releases/download/${BROOK_VERSION}/brook" \
+    && BROOK_URL="https://github.com/txthinking/brook/releases/latest/download/brook" \
+    && if [[ ${BROOK_VERSION} ]]; then BROOK_URL="https://github.com/txthinking/brook/releases/download/${BROOK_VERSION}/brook"; fi \
     && curl -fsSL "$BROOK_URL" -o /usr/local/bin/brook \
     && chmod +x /usr/local/bin/brook
 
