@@ -12,7 +12,7 @@ ENV BROOK_VERSION=${BROOK_VERSION:-"v20200201"}
 # https://github.com/txthinking/brook/releases/latest/download/brook
 RUN set -xe \
     && BROOK_URL="https://github.com/txthinking/brook/releases/download/${BROOK_VERSION}/brook" \
-    && curl -fSL "$BROOK_URL" -o /usr/local/bin/brook \
+    && curl -fsSL "$BROOK_URL" -o /usr/local/bin/brook \
     && chmod +x /usr/local/bin/brook
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
