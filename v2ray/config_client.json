@@ -1,0 +1,96 @@
+{
+  "log": {
+    "access": "",
+    "error": "",
+    "loglevel": "warning"
+  },
+  "dns": {},
+  "stats": {},
+  "inbounds": [
+    {
+      "tag": "in_proxy",
+      "port": 1080,
+      "protocol": "socks",
+      "listen": "0.0.0.0",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "clients": null
+      },
+      "streamSettings": null
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "out_proxy",
+      "protocol": "vmess",
+      "settings": {
+        "vnext": [
+          {
+            "address": "172.17.0.1",
+            "port": 10086,
+            "users": [
+              {
+                "id": "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297",
+                "alterId": 64,
+                "security": "auto"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": null,
+        "tlsSettings": {},
+        "tcpSettings": {},
+        "kcpSettings": {},
+        "wsSettings": {},
+        "httpSettings": {},
+        "dsSettings": {},
+        "quicSettings": {}
+      },
+      "mux": {
+        "enabled": true
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {}
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "domain": [
+          "geosite:google",
+          "geosite:github",
+          "geosite:netflix",
+          "geosite:steam",
+          "geosite:telegram",
+          "geosite:tumblr",
+          "geosite:speedtest",
+          "geosite:bbc"
+        ],
+        "outboundTag": "out_proxy"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:cn"
+        ],
+        "outboundTag": "direct"
+      }
+    ]
+  }
+}
