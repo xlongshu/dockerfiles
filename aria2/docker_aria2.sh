@@ -3,14 +3,16 @@
 
 export RPC_SECRET=${RPC_SECRET:-"docker-aria2"}
 
-export DOWNLOAD_DIR=${DOWNLOAD_DIR:-"/data/download"}
+export DOWNLOAD_DIR=${DOWNLOAD_DIR:-"/download"}
 mkdir -p "${DOWNLOAD_DIR}"
 
-export CONF_FILE=${CONF_FILE:-"/data/config/aria2.conf"}
-mkdir -p "$(dirname "${CONF_FILE}")"
-mkdir -p "/data/config"
+export DATA_DIR=${DATA_DIR:-"/data"}
+mkdir -p "${DATA_DIR}"
 
-set -e
+export CONF_FILE=${CONF_FILE:-"/data/aria2.conf"}
+mkdir -p "$(dirname "${CONF_FILE}")"
+
+#set -e
 
 init_aria2_conf() {
   echo "Init CONF_FILE=${CONF_FILE}"
@@ -19,9 +21,9 @@ init_aria2_conf() {
     return 0;
   fi
 
-  touch /data/config/session.txt
-  touch /data/config/dht.dat
-  touch /data/config/dht6.dat
+  touch "${DATA_DIR}/session.txt"
+  touch "${DATA_DIR}dht.dat"
+  touch "${DATA_DIR}/dht6.dat"
 
   echo "Generate [${CONF_FILE}] ..."
   cat << EOF > "${CONF_FILE}"
@@ -65,7 +67,7 @@ force-save=true
 # 日志文件保存路径，忽略或设置为空为不保存，默认不保存。
 #log=
 # 日志级别，可选 debug, info, notice, warn, error 。默认 debug
-#log-level=warn
+log-level=notice
 # Aria2 一键安装管理脚本 与 Aria2 Pro 使用以下选项设置日志。
 # 控制台日志级别，可选 debug, info, notice, warn, error 。默认 notice
 # 建议设置为 warn ，此项仅输出警告和错误，可大幅减少日志产生并有利于排错。
@@ -73,9 +75,9 @@ console-log-level=warn
 # 安静模式，禁止在控制台输出日志，默认：false
 quiet=false
 # 从会话文件中读取下载任务
-input-file=/data/config/session.txt
+input-file=${DATA_DIR}/session.txt
 # 在Aria2退出时保存 错误/未完成 的下载任务到会话文件
-save-session=/data/config/session.txt
+save-session=${DATA_DIR}/session.txt
 # 定时保存会话, 0为退出时才保存, 需1.16.1以上版本, 默认:0
 save-session-interval=120
 #always-resume=true
@@ -132,8 +134,8 @@ bt-enable-lpd=true
 bt-max-open-files=128
 bt-max-peers=80
 #dht-listen-port=6881-6999
-dht-file-path=/data/config/dht.dat
-dht-file-path6=/data/config/dht6.dat
+dht-file-path=${DATA_DIR}/dht.dat
+dht-file-path6=${DATA_DIR}/dht6.dat
 max-overall-upload-limit=2048K
 
 bt-tracker=
@@ -143,9 +145,14 @@ EOF
 }
 
 server_AriaNg() {
-    httpd -p 80 -h /var/www
+  echo "server_AriaNg ..."
+  httpd -p 80 -h /var/www
 }
 
+server_aria2() {
+  echo "server_aria2 ..."
+  aria2c --conf-path="${CONF_FILE}" --enable-rpc --rpc-listen-all
+}
 
 echo "########"
 
@@ -153,4 +160,4 @@ init_aria2_conf
 
 server_AriaNg
 
-aria2c --conf-path="${CONF_FILE}" --enable-rpc --rpc-listen-all
+server_aria2

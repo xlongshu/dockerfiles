@@ -9,4 +9,5 @@ if [ $2 -eq 0 ]; then
 elif [ -e "${FILE_PATH}.aria2" ]; then
   echo "$(date +"%Y-%m-%d %h:%M:%s") Delete ${FILE_PATH}.aria2 ..."
   rm -vf "${FILE_PATH}.aria2"
+  chmod g+w "${FILE_PATH}"
 fi

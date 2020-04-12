@@ -13,8 +13,8 @@ docker run -it -d \
 -p 6088:80 \
 --name aria2 -h aria2 \
 --log-opt "max-size=100m" \
---restart=always \
--v ~/downloads:/data/download \
+--restart=unless-stopped \
+-v ~/downloads:/download \
 -e "RPC_SECRET=aria2c123" \
 longe/aria2
 

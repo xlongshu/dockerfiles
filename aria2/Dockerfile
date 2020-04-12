@@ -6,6 +6,7 @@ LABEL maintainer="xlongshu@163.com"
 EXPOSE 6800 80
 
 VOLUME /data
+VOLUME /download
 
 # --build-arg ARIA2_VERSION=
 ARG ARIA2_VERSION
@@ -15,7 +16,7 @@ ENV ARIA2_VERSION=${ARIA2_VERSION:-"1.35.0"}
 ENV ARIANG_VERSION=${ARIANG_VERSION:-"1.1.4"}
 
 RUN set -xe \
-    && mkdir -p /data/config /data/download \
+    && mkdir -p /data /download \
     && curl -fsSL -o /tmp/aria2.tar.bz2 "https://github.com/q3aql/aria2-static-builds/releases/download/v${ARIA2_VERSION}/aria2-${ARIA2_VERSION}-linux-gnu-64bit-build1.tar.bz2" \
     && mkdir /tmp/aria2 \
     && tar -xf /tmp/aria2.tar.bz2 --strip-components=1 -C /tmp/aria2 \
@@ -40,5 +41,7 @@ RUN chmod +x /docker_aria2.sh
 
 COPY shell/*.sh /opt/aria2/
 RUN chmod +x /opt/aria2/*.sh
+
+WORKDIR /download
 
 ENTRYPOINT ["/docker_aria2.sh"]
