@@ -26,7 +26,7 @@ RUN set -xe \
 RUN set -xe \
     && WEBPROC_URL="https://github.com/jpillora/webproc/releases/download/v0.3.3/webproc_0.3.3_linux_amd64.gz" \
     && curl -fsSL $WEBPROC_URL | gzip -d - > /usr/local/bin/webproc \
-	&& chmod +x /usr/local/bin/webproc
+    && chmod +x /usr/local/bin/webproc
 
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'

@@ -9,13 +9,15 @@
   "inbounds": [
     {
       "tag": "in_proxy",
-      "port": 1080,
       "protocol": "socks",
       "listen": "0.0.0.0",
-      "settings": {
-        "auth": "noauth",
-        "udp": true,
-        "clients": null
+      "port": 1080,
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
       },
       "streamSettings": null
     }
@@ -41,7 +43,7 @@
       },
       "streamSettings": {
         "network": "tcp",
-        "security": null,
+        "security": "none",
         "tlsSettings": {},
         "tcpSettings": {},
         "kcpSettings": {},

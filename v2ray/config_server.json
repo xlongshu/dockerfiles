@@ -23,7 +23,7 @@
       },
       "streamSettings": {
         "network": "tcp",
-        "security": null,
+        "security": "none",
         "tlsSettings": {},
         "tcpSettings": {},
         "kcpSettings": {},
