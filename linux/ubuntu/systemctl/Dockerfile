@@ -11,7 +11,7 @@ RUN set -xe \
 # docker-systemctl-replacement
 RUN set -xe \
     && if [[ -f /bin/systemctl ]]; then mv /bin/systemctl /bin/systemctl.bin; fi \
-    && curl -fSL -o /bin/systemctl "https://rawcdn.githack.com/gdraheim/docker-systemctl-replacement/v1.4.3424/files/docker/systemctl.py" \
+    && curl -fSL -o /bin/systemctl "https://cdn.jsdelivr.net/gh/gdraheim/docker-systemctl-replacement@v1.4/files/docker/systemctl.py" \
     && chmod +x /bin/systemctl
 
 RUN (cd /lib/systemd/system/sysinit.target.wants/; ls | grep -v systemd-tmpfiles-setup.service | xargs rm -f $1); \

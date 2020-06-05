@@ -3,7 +3,7 @@ FROM ubuntu:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"
 
-# --build-arg MIRROR_UBUNTU=mirrors.ustc.edu.cn
+# --build-arg MIRROR_UBUNTU=mirrors.aliyun.com
 ARG MIRROR_UBUNTU
 ENV MIRROR_UBUNTU=$MIRROR_UBUNTU
 
@@ -39,4 +39,6 @@ RUN set -xe \
     && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
 
 RUN set -xe \
-    && curl -fsSL -o /root/shell_env.sh "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/shell_env.sh"
+    && curl -fsSL -o /root/shell_env.sh "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/shell_env.sh" \
+    && curl -fsSL -o /usr/sbin/noone "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/noone.sh" \
+    && chmod +x /usr/sbin/noone
