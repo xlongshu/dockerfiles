@@ -1,4 +1,4 @@
-ARG FROM_TAG=9
+ARG FROM_TAG=10
 FROM debian:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"
@@ -38,6 +38,5 @@ RUN set -xe \
     && echo 'set show-all-if-ambiguous on' >> $HOME/.inputrc \
     && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
 
-ADD shell_env.sh /root/
-
-CMD ["/bin/bash"]
+RUN set -xe \
+    && curl -fsSL -o /root/shell_env.sh "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/shell_env.sh"

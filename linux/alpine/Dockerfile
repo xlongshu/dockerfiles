@@ -1,4 +1,4 @@
-ARG FROM_TAG=3.10
+ARG FROM_TAG=3.12
 FROM alpine:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"
@@ -29,6 +29,7 @@ RUN set -xe \
     && echo 'set show-all-if-ambiguous on' >> $HOME/.inputrc \
     && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
 
-ADD shell_env.sh /root/
-
-CMD ["/bin/sh"]
+RUN set -xe \
+    && curl -fsSL -o /root/shell_env.sh "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/shell_env.sh" \
+    && curl -fsSL -o /usr/sbin/noone "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/noone.sh" \
+    && chmod +x /usr/sbin/noone
