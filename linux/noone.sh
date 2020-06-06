@@ -1,10 +1,8 @@
 #!/bin/sh
 
-: "${NO1_LOG_PATH:="/var/log/noone"}"
-: "${NO1_RUN_PATH:="/var/run/noone"}"
+: "${NO1_LOG_PATH:="/tmp/noone/log"}"
+: "${NO1_RUN_PATH:="/tmp/noone/run"}"
 : "${NO1_COMMAND:=""}"
-
-mkdir -p ${NO1_LOG_PATH} ${NO1_RUN_PATH}
 
 do_start() {
   RUN_BIN=$1
@@ -15,7 +13,7 @@ do_start() {
   nohup "${RUN_BIN}" "$@" 1>>"${NO1_LOG_PATH}/${BIN_NAME}.out" 2>>"${NO1_LOG_PATH}/${BIN_NAME}.err" &
   #setsid "${RUN_BIN}" "$@" 1>>"${NO1_LOG_PATH}/${BIN_NAME}.out" 2>>"${NO1_LOG_PATH}/${BIN_NAME}.err"
   echo $! >"${NO1_RUN_PATH}/${BIN_NAME}.pid"
-  echo "Log: ${NO1_LOG_PATH}/${BIN_NAME}.out ${NO1_LOG_PATH}/${BIN_NAME}.err"
+  echo ">>Log: ${NO1_LOG_PATH}/${BIN_NAME}.out ${NO1_LOG_PATH}/${BIN_NAME}.err"
 }
 
 do_run() {
@@ -30,7 +28,9 @@ do_stop() {
   BIN_NAME=$(basename "$RUN_BIN")
   RUN_PID=$(cat "${NO1_RUN_PATH}/${BIN_NAME}.pid")
   if [ -n "${RUN_PID}" ]; then
-    kill -15 "${RUN_PID}" || kill -9 "${RUN_PID}"
+    if kill -15 "${RUN_PID}" || kill -9 "${RUN_PID}"; then
+      rm -f "${NO1_RUN_PATH}/${BIN_NAME}.pid"
+    fi
   fi
 }
 
@@ -44,19 +44,26 @@ do_help() {
 }
 
 keep_run() {
-  if [ ! -f /dev/noone ]; then
-    echo "Keep runing..."
-    touch /dev/noone
+  if [ ! -f /dev/mqueue/noone ]; then
+    echo ">>Keep runing..."
+    touch /dev/mqueue/noone
     # tail -f /dev/null
     while true; do sleep 86400; done
   fi
 }
 
 main() {
-  echo "Exec: [$*]"
+  echo ">>Args: [$*]"
+  mkdir -p ${NO1_LOG_PATH} ${NO1_RUN_PATH}
+
   [ "$1" = "noone" ] && shift
   action=$1
-  shift
+  if type "${action}" >/dev/null 2>&1; then
+    action="run"
+  else
+    shift
+  fi
+
   case ${action} in
   run | start | stop | restart | help)
     echo "do_$action $*"
@@ -71,14 +78,13 @@ main() {
     ;;
   esac
 
-  sleep 1
   keep_run
 }
 
 if [ $# -gt 1 ]; then
   main "$@"
 elif [ -n "${NO1_COMMAND}" ]; then
-  echo "Cmd: ${NO1_COMMAND}"
+  echo ">>Cmd: ${NO1_COMMAND}"
   set -- ${NO1_COMMAND}
   main "$@"
 else
