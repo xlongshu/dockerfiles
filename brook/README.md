@@ -20,6 +20,10 @@ longe/brook
 - alpine
 
 ```bash
+# 3.12, v20200502
+#docker build -t longe/brook:v20200502 -t longe/brook ./ --build-arg FROM_TAG=3.12 --build-arg BROOK_VERSION=v20200502 --pull
+build.sh -i longe/brook -t v20200502,latest -p brook -A FROM_TAG=3.12 -A BROOK_VERSION=v20200502 -U build
+
 # 3.10
 docker build -t longe/brook:latest ./
 docker tag longe/brook:latest longe/brook:v20200201
@@ -46,6 +50,8 @@ docker build -t longe/brook:v20200201-buster ./ --build-arg FROM_IMG=debian --bu
 
 ```
 
+
+- nginx
 
 ```nginx
 http {
@@ -76,9 +82,20 @@ http {
             proxy_pass http://127.0.0.1:6080;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
+            #proxy_set_header  Connection "upgrade";
             proxy_set_header Connection $connection_upgrade;
         }
     }
 
+}
+```
+
+
+- caddy
+
+```
+ws.domain.com {
+  reverse_proxy * https://docs.gitbook.com
+  reverse_proxy /ws http://127.0.0.1:6080
 }
 ```

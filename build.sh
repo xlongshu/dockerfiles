@@ -29,6 +29,7 @@ docker_build() {
 
   local BUILD_CMD="docker build ${TAG_LIST} ${B_PATH_REAL}"
   [ -n "${B_FILE}" ] && BUILD_CMD="${BUILD_CMD} -f ${B_FILE}"
+  [ -n "${BUILD_OPTS}" ] && BUILD_CMD="${BUILD_CMD} ${BUILD_OPTS}"
   [ -n "${BUILD_ARGS}" ] && BUILD_CMD="${BUILD_CMD} ${BUILD_ARGS}"
   echo ">>Build cmd: [${BUILD_CMD}]"
   sleep 2
@@ -44,8 +45,15 @@ docker_push() {
   done
 }
 
+BUILD_ARGS=""
+BUILD_OPTS="--rm"
+
+B_PATH=$PWD
+B_PATH_REAL=$(realpath "${B_PATH}")
+B_IMAGE="${B_PATH##*/}"
+
 OPTIND=1
-while getopts ":i:t:p:f:A:" opt; do
+while getopts ":i:t:p:f:A:UN" opt; do
   case $opt in
   i)
     # image name
@@ -67,6 +75,14 @@ while getopts ":i:t:p:f:A:" opt; do
   A)
     # --build-arg list    Set build-time variables
     BUILD_ARGS="${BUILD_ARGS} --build-arg ${OPTARG} "
+    ;;
+  U)
+    # --pull
+    BUILD_OPTS="${BUILD_OPTS} --pull"
+    ;;
+  N)
+    # --no-cache
+    BUILD_OPTS="${BUILD_OPTS} --no-cache"
     ;;
   ?)
     echo "Invalid option: -$OPTARG" >&2

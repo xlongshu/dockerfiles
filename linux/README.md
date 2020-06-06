@@ -29,7 +29,7 @@ build.sh -i longe/ubuntu -t 20.04,focal -p linux/ubuntu -A FROM_TAG=20.04 -A MIR
 ## ubuntu-systemctl build-arg
 # default: --build-arg FROM_TAG=18.04
 # FROM_TAG: latest, bionic, 18.04, xenial, 16.04, ...
-docker build -t longe/ubuntu:16.04-systemctl -t longe/ubuntu:xenial-systemctl ./ubuntu/systemctl --build-arg FROM_TAG=16.04
+#docker build -t longe/ubuntu:16.04-systemctl -t longe/ubuntu:xenial-systemctl ./ubuntu/systemctl --build-arg FROM_TAG=16.04
 build.sh -i longe/ubuntu -t 16.04-systemctl,xenial-systemctl -p linux/ubuntu/systemctl -A FROM_TAG=16.04 build
 
 #docker build -t longe/ubuntu:18.04-systemctl -t longe/ubuntu:bionic-systemctl -t longe/ubuntu:latest-systemctl ./ubuntu/systemctl
@@ -59,7 +59,7 @@ build.sh -i longe/debian -t 10,buster,latest -p linux/debian -A FROM_TAG=10 -A M
 # default: --build-arg FROM_TAG=10
 # FROM_TAG: latest, buster, 10, stretch, 9, ...
 # systemctl
-docker build -t longe/debian:9-systemctl -t longe/debian:stretch-systemctl ./debian/systemctl --build-arg FROM_TAG=9
+#docker build -t longe/debian:9-systemctl -t longe/debian:stretch-systemctl ./debian/systemctl --build-arg FROM_TAG=9
 build.sh -i longe/debian -t 9-systemctl,stretch-systemctl -p linux/debian/systemctl -A FROM_TAG=9 build
 
 #docker build -t longe/debian:10-systemctl -t longe/debian:buster-systemctl -t longe/debian:latest-systemctl ./debian/systemctl
