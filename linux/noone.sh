@@ -32,7 +32,7 @@ do_start() {
   echo $! >"${NO1_RUN_PATH}/${BIN_NAME}.pid"
   echo ">>Log: ${NO1_LOG_PATH}/${BIN_NAME}.out ${NO1_LOG_PATH}/${BIN_NAME}.err"
 
-  keep_run "$@"
+  keep_run "$RUN_BIN"
 }
 
 do_stop() {
