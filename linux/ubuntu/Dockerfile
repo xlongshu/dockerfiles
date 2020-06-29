@@ -16,7 +16,7 @@ RUN set -xe; \
     && apt-get update \
     && if ! command -v gpg > /dev/null; then apt-get install -y --no-install-recommends gnupg dirmngr; fi \
     && apt-get install -y --no-install-recommends \
-    locales tzdata file tree procps psmisc iputils-ping net-tools ca-certificates curl netbase telnet \
+    locales tzdata file tree procps psmisc iputils-ping net-tools ca-certificates curl netbase telnet unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

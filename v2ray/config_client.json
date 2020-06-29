@@ -42,12 +42,14 @@
         ]
       },
       "streamSettings": {
-        "network": "tcp",
+        "network": "ws",
         "security": "none",
         "tlsSettings": {},
         "tcpSettings": {},
         "kcpSettings": {},
-        "wsSettings": {},
+        "wsSettings": {
+          "path": "/ws"
+        },
         "httpSettings": {},
         "dsSettings": {},
         "quicSettings": {}
@@ -74,7 +76,6 @@
           "geosite:steam",
           "geosite:telegram",
           "geosite:tumblr",
-          "geosite:speedtest",
           "geosite:bbc"
         ],
         "outboundTag": "out_proxy"
@@ -89,7 +90,8 @@
       {
         "type": "field",
         "domain": [
-          "geosite:cn"
+          "geosite:cn",
+          "domain:cn"
         ],
         "outboundTag": "direct"
       }

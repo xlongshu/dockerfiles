@@ -11,7 +11,7 @@ docker run -d \
 -p 10086:10086 \
 -p 18086:8080 \
 --name server_webproc -h server_webproc \
---log-opt "max-size=50m" \
+--log-opt "max-size=100m" \
 --restart=always \
 -v $(pwd)/config_server.json:/etc/v2ray/config.json \
 -e 'HTTP_USER=v2ray' -e "HTTP_PASS=server_webproc" \
@@ -21,10 +21,12 @@ longe/v2ray
 docker run -d \
 -p 10086:10086 \
 --name v2ray_server -h v2ray_server \
---log-opt "max-size=50m" \
+--log-opt "max-size=100m" \
 --restart=always \
 -v $(pwd)/config_server.json:/etc/v2ray/config.json \
-longe/v2ray v2ray -config=/etc/v2ray/config.json
+longe/v2ray noone
+
+# docker exec v2ray_server noone restart v2ray -config=/etc/v2ray/config.json
 
 
 # v2ray_client
@@ -49,11 +51,17 @@ cat /proc/sys/kernel/random/uuid
 - alpine
 
 ```bash
-# 3.10
-docker build -t longe/v2ray ./
-docker tag longe/v2ray:latest longe/v2ray:v4.23.1
+# 3.12, v4.25.1
+build.sh -i longe/v2ray -t v4.25.1,latest -p v2ray -A FROM_TAG=3.12 -A V2RAY_VERSION=v4.25.1 -U build
 
-# 3.9
+# 3.12, v4.23.4
+#docker build -t longe/v2ray:v4.23.4 -t longe/v2ray ./ --build-arg FROM_TAG=3.12 --build-arg V2RAY_VERSION=v4.23.4 --pull
+build.sh -i longe/v2ray -t v4.23.4 -p v2ray -A FROM_TAG=3.12 -A V2RAY_VERSION=v4.23.4 -U build
+
+# 3.10, v4.23.1
+docker build -t onge/v2ray:v4.23.1 ./ --build-arg FROM_TAG=3.10 --build-arg V2RAY_VERSION=v4.23.1
+
+# 3.9, v4.23.1
 docker build -t longe/v2ray:v4.23.1-alpine-3.9 ./ --build-arg FROM_TAG=3.9 --build-arg V2RAY_VERSION=v4.23.1
 ```
 
@@ -62,10 +70,10 @@ docker build -t longe/v2ray:v4.23.1-alpine-3.9 ./ --build-arg FROM_TAG=3.9 --bui
 
 ```bash
 # 18.04 bionic
-docker build -t longe/v2ray:v4.23.1-bionic ./ --build-arg FROM_IMG=ubuntu --build-arg FROM_TAG=18.04 --build-arg V2RAY_VERSION=v4.23.1
+build.sh -i longe/v2ray -t latest -p v2ray -A FROM_IMG=ubuntu -A FROM_TAG=18.04 build
 
 # 10 buster
-docker build -t longe/v2ray:v4.23.1-buster ./ --build-arg FROM_IMG=debian --build-arg FROM_TAG=10 --build-arg V2RAY_VERSION=v4.23.1
+build.sh -i longe/v2ray -t latest -p v2ray -A FROM_IMG=debian -A FROM_TAG=10 build
 
 ```
 
@@ -112,12 +120,22 @@ http {
 
         # v2ray websocket
         location /ws {
-            proxy_pass http://127.0.0.1:10088;
+            proxy_pass http://127.0.0.1:10086;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $connection_upgrade;
         }
     }
 
+}
+```
+
+
+- caddy
+
+```
+ws.domain.com {
+  reverse_proxy * https://help.github.com
+  reverse_proxy /ws http://127.0.0.1:10086
 }
 ```
