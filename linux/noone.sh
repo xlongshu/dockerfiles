@@ -3,6 +3,23 @@
 : "${NO1_LOG_PATH:="/tmp/noone/log"}"
 : "${NO1_RUN_PATH:="/tmp/noone/run"}"
 : "${NO1_COMMAND:=""}"
+: "${NO1_NOLOG:=""}"
+
+keep_run() {
+  RUN_BIN=$1
+  BIN_NAME=$(basename "$RUN_BIN")
+  if [ ! -f /dev/mqueue/noone ]; then
+    echo ">>Keep ${BIN_NAME} runing..."
+    touch /dev/mqueue/noone
+    if [ "$NO1_NOLOG" = "1" ]; then
+      # tail -f /dev/null
+      while true; do sleep 86400; done
+    else
+      # show logs
+      tail -n 500 -f "${NO1_LOG_PATH}/${BIN_NAME}.err" "${NO1_LOG_PATH}/${BIN_NAME}.out"
+    fi
+  fi
+}
 
 do_start() {
   RUN_BIN=$1
@@ -14,13 +31,8 @@ do_start() {
   #setsid "${RUN_BIN}" "$@" 1>>"${NO1_LOG_PATH}/${BIN_NAME}.out" 2>>"${NO1_LOG_PATH}/${BIN_NAME}.err"
   echo $! >"${NO1_RUN_PATH}/${BIN_NAME}.pid"
   echo ">>Log: ${NO1_LOG_PATH}/${BIN_NAME}.out ${NO1_LOG_PATH}/${BIN_NAME}.err"
-}
 
-do_run() {
-  do_start "$@"
-  RUN_BIN=$1
-  BIN_NAME=$(basename "$RUN_BIN")
-  tail -n 500 -f "${NO1_LOG_PATH}/${BIN_NAME}.err" "${NO1_LOG_PATH}/${BIN_NAME}.out"
+  keep_run "$@"
 }
 
 do_stop() {
@@ -28,6 +40,7 @@ do_stop() {
   BIN_NAME=$(basename "$RUN_BIN")
   RUN_PID=$(cat "${NO1_RUN_PATH}/${BIN_NAME}.pid")
   if [ -n "${RUN_PID}" ]; then
+    echo ">>Stop: ${BIN_NAME}@${RUN_PID} ..."
     if kill -15 "${RUN_PID}" || kill -9 "${RUN_PID}"; then
       rm -f "${NO1_RUN_PATH}/${BIN_NAME}.pid"
     fi
@@ -40,16 +53,7 @@ do_restart() {
 }
 
 do_help() {
-  echo "Usage: noone (start|stop|restart|run) <command...>"
-}
-
-keep_run() {
-  if [ ! -f /dev/mqueue/noone ]; then
-    echo ">>Keep runing..."
-    touch /dev/mqueue/noone
-    # tail -f /dev/null
-    while true; do sleep 86400; done
-  fi
+  echo "Usage: noone (start|stop|restart) <command...>"
 }
 
 main() {
@@ -59,13 +63,13 @@ main() {
   [ "$1" = "noone" ] && shift
   action=$1
   if type "${action}" >/dev/null 2>&1; then
-    action="run"
+    action="start"
   else
     shift
   fi
 
   case ${action} in
-  run | start | stop | restart | help)
+  start | stop | restart | help)
     echo "do_$action $*"
     do_"$action" "$@"
     ;;
@@ -78,7 +82,6 @@ main() {
     ;;
   esac
 
-  keep_run
 }
 
 if [ $# -gt 1 ]; then
