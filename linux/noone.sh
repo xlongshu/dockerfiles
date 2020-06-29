@@ -30,6 +30,8 @@ do_start() {
   nohup "${RUN_BIN}" "$@" 1>>"${NO1_LOG_PATH}/${BIN_NAME}.out" 2>>"${NO1_LOG_PATH}/${BIN_NAME}.err" &
   #setsid "${RUN_BIN}" "$@" 1>>"${NO1_LOG_PATH}/${BIN_NAME}.out" 2>>"${NO1_LOG_PATH}/${BIN_NAME}.err"
   echo $! >"${NO1_RUN_PATH}/${BIN_NAME}.pid"
+  RUN_PID=$(cat "${NO1_RUN_PATH}/${BIN_NAME}.pid")
+  echo ">>Start: ${BIN_NAME}@${RUN_PID} ..."
   echo ">>Log: ${NO1_LOG_PATH}/${BIN_NAME}.out ${NO1_LOG_PATH}/${BIN_NAME}.err"
 
   keep_run "$RUN_BIN"
@@ -41,14 +43,16 @@ do_stop() {
   RUN_PID=$(cat "${NO1_RUN_PATH}/${BIN_NAME}.pid")
   if [ -n "${RUN_PID}" ]; then
     echo ">>Stop: ${BIN_NAME}@${RUN_PID} ..."
+    rm -f "${NO1_RUN_PATH}/${BIN_NAME}.pid"
     if kill -15 "${RUN_PID}" || kill -9 "${RUN_PID}"; then
-      rm -f "${NO1_RUN_PATH}/${BIN_NAME}.pid"
+      echo ">>Killd: ${BIN_NAME}@${RUN_PID}"
     fi
   fi
 }
 
 do_restart() {
   do_stop "$@"
+  sleep 1.5
   do_start "$@"
 }
 
