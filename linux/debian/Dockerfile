@@ -39,6 +39,6 @@ RUN set -xe \
     && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
 
 RUN set -xe \
-    && curl -fsSL -o /root/shell_env.sh "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/shell_env.sh" \
-    && curl -fsSL -o /usr/sbin/noone "https://cdn.jsdelivr.net/gh/xlongshu/dockerfiles/linux/noone.sh" \
+    && curl -fsSL -o /root/shell_env.sh "https://raw.githubusercontent.com/xlongshu/dockerfiles/master/linux/shell_env.sh" \
+    && curl -fsSL -o /usr/sbin/noone "https://raw.githubusercontent.com/xlongshu/dockerfiles/master/linux/noone.sh" \
     && chmod +x /usr/sbin/noone
