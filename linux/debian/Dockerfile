@@ -7,6 +7,9 @@ LABEL maintainer="xlongshu@163.com"
 ARG MIRROR_DEBIAN
 ENV MIRROR_DEBIAN=$MIRROR_DEBIAN
 
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN set -xe; \
     if [ ${MIRROR_DEBIAN} ]; then \
         cp -f /etc/apt/sources.list /etc/apt/sources.list.backup; \
@@ -19,9 +22,6 @@ RUN set -xe; \
     locales tzdata file tree procps psmisc iputils-ping net-tools ca-certificates curl netbase telnet unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN set -x \
     && localedef -c -i en_US -f UTF-8 en_US.UTF-8 \
@@ -36,9 +36,9 @@ ENV _PS1="docker-debian"
 RUN set -xe \
     && echo 'set completion-ignore-case on' >> $HOME/.inputrc \
     && echo 'set show-all-if-ambiguous on' >> $HOME/.inputrc \
-    && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
+    && echo '[ -f $HOME/.shell_env ] && source $HOME/.shell_env' >> $HOME/.bashrc
 
 RUN set -xe \
-    && curl -fsSL -o /root/shell_env.sh "https://raw.githubusercontent.com/xlongshu/dockerfiles/master/linux/shell_env.sh" \
-    && curl -fsSL -o /usr/sbin/noone "https://raw.githubusercontent.com/xlongshu/dockerfiles/master/linux/noone.sh" \
+    && curl -fsSL -o /root/.shell_env "https://raw.fastgit.org/xlongshu/dockerfiles/master/linux/shell_env.sh" \
+    && curl -fsSL -o /usr/sbin/noone "https://raw.fastgit.org/xlongshu/dockerfiles/master/linux/noone.sh" \
     && chmod +x /usr/sbin/noone

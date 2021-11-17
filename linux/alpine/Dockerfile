@@ -27,9 +27,9 @@ RUN set -xe \
     && echo "root:`date -R|sha256sum|base64|head -c 12`" | chpasswd \
     && echo 'set completion-ignore-case on' >> $HOME/.inputrc \
     && echo 'set show-all-if-ambiguous on' >> $HOME/.inputrc \
-    && echo '[ -f $HOME/shell_env.sh ] && source $HOME/shell_env.sh' >> $HOME/.bashrc
+    && echo '[ -f $HOME/.shell_env ] && source $HOME/.shell_env' >> $HOME/.bashrc
 
 RUN set -xe \
-    && curl -fsSL -o /root/shell_env.sh "https://raw.githubusercontent.com/xlongshu/dockerfiles/master/linux/shell_env.sh" \
-    && curl -fsSL -o /usr/sbin/noone "https://raw.githubusercontent.com/xlongshu/dockerfiles/master/linux/noone.sh" \
+    && curl -fsSL -o /root/.shell_env "https://raw.fastgit.org/xlongshu/dockerfiles/master/linux/shell_env.sh" \
+    && curl -fsSL -o /usr/sbin/noone "https://raw.fastgit.org/xlongshu/dockerfiles/master/linux/noone.sh" \
     && chmod +x /usr/sbin/noone

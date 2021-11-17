@@ -1,7 +1,7 @@
 #!/bin/bash
 # $HOME/.shell_env
 
-alias renv="source $HOME/.shell_env"
+alias renv='source $HOME/.shell_env'
 
 # PS1
 export _PS1=${_PS1:-"docker"}
