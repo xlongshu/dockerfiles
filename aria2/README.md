@@ -26,12 +26,12 @@ longe/aria2
 - alpine
 
 ```bash
-# 3.10
-docker build -t longe/aria2:latest ./ --build-arg ARIA2_VERSION=1.35.0
-docker tag longe/aria2:latest longe/aria2:1.35.0
+# 3.12
+# docker build -t longe/aria2:latest -t longe/aria2:1.35.0 ./ --build-arg ARIA2_VERSION=1.35.0
+build.sh -i longe/aria2 -t 1.35.0,latest -p aria2 -A FROM_TAG=3.12 -A ARIA2_VERSION=1.35.0 -U build
 
-# 3.9
-docker build -t longe/aria2:1.35.0-alpine-3.9 ./ --build-arg FROM_TAG=3.9 --build-arg ARIA2_VERSION=1.35.0
+build.sh -i longe/aria2 -t 1.35.0,latest -p aria2 -A ARIA2_VERSION=1.36.0 -A ARIANG_VERSION=1.2.3 -U build
+
 ```
 
 

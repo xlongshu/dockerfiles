@@ -35,7 +35,7 @@ dir=${DOWNLOAD_DIR}
 # 最大同时下载数(任务数), 路由建议值: 3
 max-concurrent-downloads=5
 # 同服务器连接数
-max-connection-per-server=6
+max-connection-per-server=8
 # 断点续传
 continue=true
 # 检查完整性
@@ -62,7 +62,7 @@ rpc-secret=${RPC_SECRET}
 
 
 ## Advanced Options
-disable-ipv6=true
+#disable-ipv6=true
 force-save=true
 # 日志文件保存路径，忽略或设置为空为不保存，默认不保存。
 #log=
@@ -87,9 +87,9 @@ timeout=60
 http-accept-gzip=true
 content-disposition-default-utf8=true
 # 最小文件分片大小, 下载线程数上限取决于能分出多少片, 对于小文件重要
-min-split-size=16M
+min-split-size=2M
 # 单文件最大线程数, 路由建议值: 5
-split=4
+split=6
 # 下载速度限制
 max-overall-download-limit=0
 # 单文件速度限制
@@ -131,14 +131,13 @@ on-download-complete=/opt/aria2/on_complete.sh
 
 ## BitTorrent/Metalink Options
 bt-enable-lpd=true
-bt-max-open-files=128
-bt-max-peers=80
-#dht-listen-port=6881-6999
+bt-max-open-files=256
+bt-max-peers=100
+dht-listen-port=6881-6999
 dht-file-path=${DATA_DIR}/dht.dat
 dht-file-path6=${DATA_DIR}/dht6.dat
-max-overall-upload-limit=2048K
 
-bt-tracker=
+bt-tracker=bt-tracker=udp://tracker.opentrackr.org:1337/announce,http://tracker.opentrackr.org:1337/announce,http://p4p.arenabg.com:1337/announce,udp://p4p.arenabg.com:1337/announce,udp://9.rarbg.to:2710/announce,udp://9.rarbg.me:2710/announce,udp://exodus.desync.com:6969/announce
 
 EOF
 
