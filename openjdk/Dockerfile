@@ -7,6 +7,9 @@ LABEL maintainer="xlongshu@163.com"
 ARG MIRROR_DEBIAN
 ENV MIRROR_DEBIAN=$MIRROR_DEBIAN
 
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN set -xe; \
     if [ ${MIRROR_DEBIAN} ]; then \
         cp -f /etc/apt/sources.list /etc/apt/sources.list.backup; \
@@ -18,9 +21,6 @@ RUN set -xe; \
     locales tzdata file tree procps psmisc iputils-ping net-tools ca-certificates curl netbase telnet \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN set -x \
     && localedef -c -i en_US -f UTF-8 en_US.UTF-8 \

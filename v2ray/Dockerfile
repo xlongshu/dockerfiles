@@ -13,10 +13,13 @@ ARG V2RAY_VERSION
 
 ENV V2RAY_VERSION=${V2RAY_VERSION}
 
+# https://github.com/v2fly/v2ray-core/releases/download/${V2RAY_VERSION}/v2ray-linux-64.zip
+# https://hub.fastgit.org/v2fly/v2ray-core/releases/download/${V2RAY_VERSION}/v2ray-linux-64.zip
+# https://download.fastgit.org/v2fly/v2ray-core/releases/download/${V2RAY_VERSION}/v2ray-linux-64.zip
 # https://cdn.jsdelivr.net/gh/v2ray/dist/v2ray-linux-64.zip
 # https://cdn.jsdelivr.net/gh/v2ray/dist@${V2RAY_VERSION}/v2ray-linux-64.zip
 RUN set -xe \
-    && mkdir -p /etc/v2ray \
+    && mkdir -p /etc/v2ray/conf.d \
     && mkdir -p /usr/bin/v2ray \
     && mkdir -p /var/log/v2ray \
     && V2RAY_URL="https://github.com/v2fly/v2ray-core/releases/latest/download/v2ray-linux-64.zip" \
@@ -36,6 +39,9 @@ ENV PATH /usr/bin/v2ray:$PATH
 ENV _PS1="docker-v2ray"
 
 ENV NO1_COMMAND="start v2ray -config=/etc/v2ray/config.json"
+# v2ray -confdir /etc/v2ray/conf.d
+# for BASE in 00_log 01_api 02_dns 03_routing 04_policy 05_inbounds 06_outbounds 07_transport 08_stats 09_reverse; do echo '{}' > "$BASE.json"; done
+ENV V2RAY_LOCATION_CONFDIR=""
 
 COPY config_server.json /etc/v2ray/config.json
 
