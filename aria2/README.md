@@ -28,9 +28,9 @@ longe/aria2
 ```bash
 # 3.12
 # docker build -t longe/aria2:latest -t longe/aria2:1.35.0 ./ --build-arg ARIA2_VERSION=1.35.0
-build.sh -i longe/aria2 -t 1.35.0,latest -p aria2 -A FROM_TAG=3.12 -A ARIA2_VERSION=1.35.0 -U build
+build.sh -i longe/aria2 -t 1.35.0 -p aria2 -A FROM_TAG=3.12 -A ARIA2_VERSION=1.35.0 -U build
 
-build.sh -i longe/aria2 -t 1.35.0,latest -p aria2 -A ARIA2_VERSION=1.36.0 -A ARIANG_VERSION=1.2.3 -U build
+build.sh -i longe/aria2 -t 1.36.0,latest -p aria2 -A ARIA2_VERSION=1.36.0 -A ARIANG_VERSION=1.2.3 -U build
 
 ```
 
@@ -38,7 +38,7 @@ build.sh -i longe/aria2 -t 1.35.0,latest -p aria2 -A ARIA2_VERSION=1.36.0 -A ARI
 ```
 # https://github.com/aria2/aria2
 # https://github.com/q3aql/aria2-static-builds/releases
-
+# https://github.com/P3TERX/Aria2-Pro-Core/releases
 # https://github.com/P3TERX/aria2.conf
 # https://github.com/P3TERX/docker-aria2-pro
 
