@@ -1,5 +1,5 @@
 ARG FROM_IMG=alpine
-ARG FROM_TAG=3.12
+ARG FROM_TAG=3.14
 FROM longe/${FROM_IMG}:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"

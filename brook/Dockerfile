@@ -1,5 +1,5 @@
 ARG FROM_IMG=alpine
-ARG FROM_TAG=3.10
+ARG FROM_TAG=3.14
 FROM longe/${FROM_IMG}:${FROM_TAG}
 
 LABEL maintainer="xlongshu@163.com"
@@ -8,9 +8,11 @@ LABEL maintainer="xlongshu@163.com"
 ARG BROOK_VERSION
 ENV BROOK_VERSION=${BROOK_VERSION}
 
+# https://github.com/txthinking/brook/releases/download/${BROOK_VERSION}/brook_linux_amd64
+# https://hub.fastgit.org/txthinking/brook/releases/latest/download/brook_linux_amd64
 RUN set -xe \
-    && BROOK_URL="https://github.com/txthinking/brook/releases/latest/download/brook" \
-    && if [[ ${BROOK_VERSION} ]]; then BROOK_URL="https://github.com/txthinking/brook/releases/download/${BROOK_VERSION}/brook"; fi \
+    && BROOK_URL="https://github.com/txthinking/brook/releases/latest/download/brook_linux_amd64" \
+    && if [[ ${BROOK_VERSION} ]]; then BROOK_URL="https://github.com/txthinking/brook/releases/download/${BROOK_VERSION}/brook_linux_amd64"; fi \
     && curl -fsSL "$BROOK_URL" -o /usr/local/bin/brook \
     && chmod +x /usr/local/bin/brook
 
